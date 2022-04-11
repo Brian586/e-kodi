@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:rekodi/auth/auth.dart';
+import 'package:rekodi/providers/loader.dart';
 
 class AccountButton extends StatefulWidget {
   final String? title;
@@ -21,7 +24,13 @@ class _AccountButtonState extends State<AccountButton> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: InkWell(
-        onTap: () {},
+        onTap: () async {
+          String res = await Authentication().performAuthentication(context, widget.authType!, widget.isSignUp!);
+
+          context.read<Loader>().switchLoadingState(false);
+
+          print(res);
+        },
         onHover: (v) {
           setState(() {
             isHovered = true;

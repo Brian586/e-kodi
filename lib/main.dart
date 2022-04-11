@@ -1,9 +1,33 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rekodi/config.dart';
+import 'package:rekodi/model/account.dart';
 import 'package:rekodi/pages/home.dart';
 import 'package:rekodi/pages/authPage.dart';
+import 'package:rekodi/providers/loader.dart';
+// Import the generated file
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<EKodi>(create: (_)=> EKodi(),),
+      ChangeNotifierProvider<Loader>(create: (_)=> Loader())
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -20,9 +44,59 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomePage(),
+        "/": (context) => const SplashScreen(),
+        '/home': (context) => const HomePage(),
         "/auth": (context) => const AuthPage(),
       },
     );
   }
 }
+
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+
+    displaySplash();
+  }
+
+  displaySplash() async {
+    Timer(const Duration(seconds: 3), () async {
+      auth
+          .authStateChanges()
+          .listen((User? user) async {
+        if (user == null) {
+          Navigator.pushReplacementNamed(context, "/home");
+        } else {
+          //TODO: GET USER INFO FIRST
+          final user = FirebaseAuth.instance.currentUser;
+
+          await FirebaseFirestore.instance.collection("users").doc(user!.uid).get().then((value) {
+            Account account = Account.fromDocument(value);
+
+            context.watch<EKodi>().switchUser(account);
+          });
+
+          Navigator.pushReplacementNamed(context, "/dashboard");
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+

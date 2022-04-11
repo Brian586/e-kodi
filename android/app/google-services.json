@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "275250872466",
+    "project_id": "e-kodi-202ba",
+    "storage_bucket": "e-kodi-202ba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275250872466:android:7ea749b673fc0d53b3a64b",
+        "android_client_info": {
+          "package_name": "com.rekodi.rekodi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "275250872466-7blo3v6rdup7jjmefbu03quem59g3vmb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rekodi.rekodi",
+            "certificate_hash": "a6c3dca66e96c2bb1a534333f7648d8bd8c0a911"
+          }
+        },
+        {
+          "client_id": "275250872466-t5ihte81i9k1lfm9a0o719jhg76p8g7i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUuPwlLvodkNrE6Jh6k7XGbvVLD0FscZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "275250872466-t5ihte81i9k1lfm9a0o719jhg76p8g7i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
