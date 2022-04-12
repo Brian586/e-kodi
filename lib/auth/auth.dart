@@ -12,6 +12,8 @@ import 'package:rekodi/providers/loader.dart';
 import 'package:rekodi/widgets/customTextField.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
+import '../config.dart';
+
 class Authentication {
 
   performAuthentication(BuildContext context, String authType, bool isSignUp) async {
@@ -20,6 +22,8 @@ class Authentication {
       switch (authType) {
         case "google":
           UserCredential userCredential;
+          TextEditingController _name = TextEditingController();
+          TextEditingController _phone = TextEditingController();
 
           if(kIsWeb)
             {
@@ -30,19 +34,76 @@ class Authentication {
               userCredential = await nativeSignInWithGoogle();
             }
 
-          //TODO: Display popup to take the necessary data
+          //TODO: Display popup to take the remaining data
+          await showDialog<void>(
+            context: context,
+            barrierDismissible: false, // user must tap button!
+            builder: (BuildContext context) {
+              return ResponsiveBuilder(
+                builder: (context, sizeInfo) {
+                  Size size = MediaQuery.of(context).size;
+                  bool isMobile = sizeInfo.isMobile;
+                  bool isTablet = sizeInfo.isTablet;
+
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 7.0 : isTablet ? size.width*0.1 : size.width*0.25),
+                    child: AlertDialog(
+                      title: const Text('Continue with Google'),
+                      content: SingleChildScrollView(
+                        child: ListBody(
+                          children: <Widget>[
+                            CustomTextField(
+                              controller: _name,
+                              hintText: "Name",
+                            ),
+                            CustomTextField(
+                              controller: _phone,
+                              hintText: "Phone (+254)",
+                            ),
+                          ],
+                        ),
+                      ),
+                      actions: <Widget>[
+                        RaisedButton.icon(
+                          color: Colors.red,
+                          icon: const Icon(Icons.done_rounded, color: Colors.white,),
+                          label: const Text('Proceed', style: TextStyle(color: Colors.white)),
+                          onPressed: () {
+                            if(_name.text.isNotEmpty
+                                && _phone.text.isNotEmpty
+                                )
+                            {
+                              context.read<Loader>().switchLoadingState(true);
+
+                              Navigator.pop(context);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          );
+
 
           Account account = Account(
-            name: userCredential.user!.displayName,
+            name: _name.text.trim(),
             userID: userCredential.user!.uid,
             email: userCredential.user!.email,
-            // phone: phone!,
-            // idNumber: idNo!,
-            // accountType: accountType!,
-            photoUrl: userCredential.user!.photoURL,
+            phone: _phone.text.trim(),
+            idNumber: "",
+            accountType: "",
+            photoUrl: userCredential.user!.photoURL ?? "",
           );
 
           String res = await saveUserInfoToFirestore(account);
+
+          print(res+" 2");
+
+
+          print(res+" 3");
 
           return res;
 
@@ -57,7 +118,7 @@ class Authentication {
         case "mail":
           TextEditingController _name = TextEditingController();
           TextEditingController _phone = TextEditingController();
-          TextEditingController _id = TextEditingController();
+          //TextEditingController _id = TextEditingController();
           TextEditingController _email = TextEditingController();
           TextEditingController _password = TextEditingController();
           TextEditingController _cPassword = TextEditingController();
@@ -86,12 +147,12 @@ class Authentication {
                             ),
                             CustomTextField(
                               controller: _phone,
-                              hintText: "Phone",
+                              hintText: "Phone (+254)",
                             ),
-                            CustomTextField(
-                              controller: _id,
-                              hintText: "ID Number",
-                            ),
+                            // CustomTextField(
+                            //   controller: _id,
+                            //   hintText: "ID Number",
+                            // ),
                             CustomTextField(
                               controller: _email,
                               hintText: "Email",
@@ -108,12 +169,14 @@ class Authentication {
                         ),
                       ),
                       actions: <Widget>[
-                        TextButton(
-                          child: const Text('Approve'),
+                        RaisedButton.icon(
+                          color: Colors.red,
+                          icon: const Icon(Icons.done_rounded, color: Colors.white,),
+                          label: const Text('Proceed', style: TextStyle(color: Colors.white)),
                           onPressed: () {
                             if(_name.text.isNotEmpty
                                 && _phone.text.isNotEmpty
-                                && _email.text.isNotEmpty && _id.text.isNotEmpty
+                                && _email.text.isNotEmpty //&& _id.text.isNotEmpty
                                 && _password.text.isNotEmpty && _cPassword.text.isNotEmpty && _password.text == _cPassword.text)
                               {
                                 context.read<Loader>().switchLoadingState(true);
@@ -136,7 +199,7 @@ class Authentication {
             password: _password.text.trim(),
             phone: _phone.text.trim(),
             accountType: "",
-            idNo: _id.text.trim()
+            //idNo: _id.text.trim()
           );
 
           return res;
@@ -145,8 +208,19 @@ class Authentication {
     else {
       switch (authType) {
         case "google":
-        // do something
-          return "";
+          UserCredential userCredential;
+
+          if(kIsWeb)
+          {
+            userCredential = await webSignInWithGoogle();
+          }
+          else
+          {
+            userCredential = await nativeSignInWithGoogle();
+          }
+          String userID = userCredential.user!.uid;
+
+          return "success+$userID";
         case "apple":
         // do something else
           return "";
@@ -154,8 +228,9 @@ class Authentication {
         // do something else
           return "";
         case "mail":
-        // do something else
-          return "";
+          String res = await  loginUserWithEmail(context);
+
+          return res;
       }
     }
   }
@@ -163,10 +238,86 @@ class Authentication {
   Future<String> saveUserInfoToFirestore(Account account) async {
     await FirebaseFirestore.instance.collection("users").doc(account.userID).set(account.toMap());
 
-    return "success";
+    return "success+${account.userID}";
   }
 
-  Future<String> createUserWithEmail({String? name, String? email, String? password, String? phone, String? idNo, String? accountType}) async {
+  Future<String> loginUserWithEmail(BuildContext context) async {
+    TextEditingController _email = TextEditingController();
+    TextEditingController _password = TextEditingController();
+
+    //TODO: Display popup to take data
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return ResponsiveBuilder(
+          builder: (context, sizeInfo) {
+            Size size = MediaQuery.of(context).size;
+            bool isMobile = sizeInfo.isMobile;
+            bool isTablet = sizeInfo.isTablet;
+
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 7.0 : isTablet ? size.width*0.1 : size.width*0.25),
+              child: AlertDialog(
+                title: const Text('Continue with Email'),
+                content: SingleChildScrollView(
+                  child: ListBody(
+                    children: <Widget>[
+                      CustomTextField(
+                        controller: _email,
+                        hintText: "Email",
+                      ),
+                      CustomTextField(
+                        controller: _password,
+                        hintText: "Password",
+                      ),
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  RaisedButton.icon(
+                    color: Colors.red,
+                    icon: const Icon(Icons.done_rounded, color: Colors.white,),
+                    label: const Text('Proceed', style: TextStyle(color: Colors.white)),
+                    onPressed: () {
+                      if(_email.text.isNotEmpty
+                          && _password.text.isNotEmpty
+                      )
+                      {
+                        context.read<Loader>().switchLoadingState(true);
+
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _email.text.trim(),
+        password: _password.text.trim(),
+      );
+
+      String userID = credential.user!.uid;
+
+      return "success+$userID";
+
+    } catch(e) {
+      print(e.toString());
+
+      return "failed";
+    }
+  }
+
+
+
+  Future<String> createUserWithEmail({String? name, String? email, String? password, String? phone, String? accountType}) async {
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email!,
@@ -178,7 +329,7 @@ class Authentication {
         userID: credential.user!.uid,
         email: credential.user!.email,
         phone: phone!,
-        idNumber: idNo!,
+        idNumber: "",
         accountType: accountType!,
         photoUrl: credential.user!.photoURL ?? "",
       );

@@ -26,12 +26,12 @@ class Account {
   factory Account.fromDocument(DocumentSnapshot doc) {
     return Account(
       userID: doc.id,
-      name: doc["name"],
-      email: doc["email"],
-      phone: doc["phone"],
-      idNumber: doc["idNumber"],
-      accountType: doc["accountType"],
-      photoUrl: doc["photoUrl"]
+      name: doc.get("name") ?? "",
+      email: doc.get("email") ?? "",
+      phone: doc.get("phone") ?? "",
+      idNumber: doc.get("idNumber") ?? "",
+      accountType: doc.get("accountType") ?? "",
+      photoUrl: doc.get("photoUrl") ?? ""
     );
   }
 }

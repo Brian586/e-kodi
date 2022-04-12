@@ -56,10 +56,10 @@ class _HomeMobileState extends State<HomeMobile> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       key: _scaffoldKey,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Image.asset("assets/wa.png"),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {},
+      //   child: Image.asset("assets/wa.png"),
+      // ),
       drawer: const CustomDrawer(),
       appBar: PreferredSize(
         child: CustomAppBar(scaffoldKey: _scaffoldKey,),

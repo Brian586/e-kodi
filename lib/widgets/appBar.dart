@@ -24,6 +24,7 @@ class CustomAppBar extends StatelessWidget {
             ),
           ),
           backgroundColor: Colors.grey.shade200,
+          automaticallyImplyLeading: false,
           elevation: 0.0,
           actions: isDesktop ? [
             TextButton(

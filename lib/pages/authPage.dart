@@ -1,9 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:rekodi/config.dart';
+import 'package:rekodi/model/account.dart';
 import 'package:rekodi/providers/loader.dart';
 import 'package:rekodi/widgets/accountButton.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+
+import '../auth/auth.dart';
+import '../dialog/errorDialog.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);
@@ -31,6 +37,38 @@ class _AuthPageState extends State<AuthPage> {
     }
   }
 
+  void handleAuth(String? authType) async {
+    String res = await Authentication().performAuthentication(context, authType!, isSignUp);
+
+    await context.read<Loader>().switchLoadingState(false);
+
+    if(res.split("+").first == "success")
+    {
+      await FirebaseFirestore.instance.collection("users").doc(res.split("+").last).get().then((value) {
+        Account account = Account.fromDocument(value);
+
+        context.read<EKodi>().switchUser(account);
+      });
+
+      if(isSignUp)
+        {
+          await Navigator.pushNamed(context, "/selectAccount");
+        }
+
+      Navigator.pushReplacementNamed(context, "/dashboard");
+    }
+    else {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        // false = user must tap button, true = tap outside dialog
+        builder: (BuildContext dialogContext) {
+          return ErrorAlertDialog(message: "Error: $res",);
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -43,6 +81,12 @@ class _AuthPageState extends State<AuthPage> {
 
         return Scaffold(
           appBar: AppBar(
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back_rounded, color: Colors.grey,),
+            ),
             title: RichText(
               text: TextSpan(
                 //style: DefaultTextStyle.of(context).style,
@@ -93,24 +137,28 @@ class _AuthPageState extends State<AuthPage> {
                           title: "Continue with Google",
                           authType: "google",
                           isSignUp: isSignUp,
+                          onTap: ()=> handleAuth("google"),
                         ),
                         AccountButton(
                           icon: "assets/fb.png",
                           title: "Continue with Facebook",
                           authType: "facebook",
                           isSignUp: isSignUp,
+                          onTap: ()=> handleAuth("facebook"),
                         ),
                         AccountButton(
                           icon: "assets/apple.png",
                           title: "Continue with Apple",
                           authType: "apple",
                           isSignUp: isSignUp,
+                          onTap: ()=> handleAuth("apple"),
                         ),
                         AccountButton(
                           icon: "assets/email.png",
                           title: "Continue with Mail",
                           authType: "mail",
                           isSignUp: isSignUp,
+                          onTap: ()=> handleAuth("mail"),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(20.0),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rekodi/auth/auth.dart';
+import 'package:rekodi/config.dart';
+import 'package:rekodi/dialog/errorDialog.dart';
 import 'package:rekodi/providers/loader.dart';
 
 class AccountButton extends StatefulWidget {
@@ -9,14 +11,15 @@ class AccountButton extends StatefulWidget {
   final String? icon;
   final String? authType;
   final bool? isSignUp;
-  const AccountButton({Key? key, this.title, this.icon, this.authType, this.isSignUp}) : super(key: key);
+  final void Function()? onTap;
+
+  const AccountButton({Key? key, this.title, this.icon, this.authType, this.isSignUp, this.onTap}) : super(key: key);
 
   @override
   State<AccountButton> createState() => _AccountButtonState();
 }
 
 class _AccountButtonState extends State<AccountButton> {
-  bool isHovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -24,18 +27,7 @@ class _AccountButtonState extends State<AccountButton> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: InkWell(
-        onTap: () async {
-          String res = await Authentication().performAuthentication(context, widget.authType!, widget.isSignUp!);
-
-          context.read<Loader>().switchLoadingState(false);
-
-          print(res);
-        },
-        onHover: (v) {
-          setState(() {
-            isHovered = true;
-          });
-        },
+        onTap: widget.onTap,
         hoverColor: Colors.transparent,
         child: Container(
           height: 60.0,

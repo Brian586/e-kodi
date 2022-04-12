@@ -46,6 +46,7 @@ dependencies:
   google_sign_in: ^5.2.4
   flutter_facebook_auth: ^4.2.0
   dropdown_search: ^2.0.1
+  fluttertoast: ^8.0.9
 
 
 dev_dependencies:

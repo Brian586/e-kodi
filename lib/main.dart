@@ -4,11 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rekodi/config.dart';
 import 'package:rekodi/model/account.dart';
+import 'package:rekodi/pages/dashboards/dashboard.dart';
 import 'package:rekodi/pages/home.dart';
 import 'package:rekodi/pages/authPage.dart';
+import 'package:rekodi/pages/selectAccount.dart';
 import 'package:rekodi/providers/loader.dart';
 // Import the generated file
 import 'firebase_options.dart';
@@ -47,6 +50,8 @@ class MyApp extends StatelessWidget {
         "/": (context) => const SplashScreen(),
         '/home': (context) => const HomePage(),
         "/auth": (context) => const AuthPage(),
+        "/dashboard": (context) => const Dashboard(),
+        "/selectAccount": (context) => const SelectAccount(),
       },
     );
   }
@@ -85,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen> {
           await FirebaseFirestore.instance.collection("users").doc(user!.uid).get().then((value) {
             Account account = Account.fromDocument(value);
 
-            context.watch<EKodi>().switchUser(account);
+            context.read<EKodi>().switchUser(account);
           });
 
           Navigator.pushReplacementNamed(context, "/dashboard");
@@ -96,7 +101,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: Center(
+        child: RichText(
+          text: TextSpan(
+            //style: DefaultTextStyle.of(context).style,
+            children: <TextSpan>[
+              TextSpan(text: 'e-', style: GoogleFonts.titanOne(color: Colors.blue, fontSize: 20.0)),
+              TextSpan(text: 'KODI', style: GoogleFonts.titanOne(color: Colors.red, fontSize: 20.0)),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
