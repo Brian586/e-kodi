@@ -1,13 +1,25 @@
+import 'dart:html';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pie_chart/pie_chart.dart';
+import 'package:pie_chart/pie_chart.dart' as pie_chart;
 import 'package:provider/provider.dart';
+import 'package:rekodi/model/property.dart';
 import 'package:rekodi/model/tabItem.dart';
 import 'package:rekodi/widgets/customTextField.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../config.dart';
 import '../../model/account.dart';
+
+class _ChartData {
+  _ChartData(this.x, this.y);
+
+  final String x;
+  final double y;
+}
 
 
 class LandlordDash extends StatefulWidget {
@@ -20,6 +32,83 @@ class LandlordDash extends StatefulWidget {
 class _LandlordDashState extends State<LandlordDash> {
   String selected = 'Dashboard';
   TextEditingController searchController = TextEditingController();
+  List<Property> properties = [];
+  bool loading = false;
+  late List<_ChartData> data;
+  late TooltipBehavior _tooltip;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    data = [
+      _ChartData('Dec', 12),
+      _ChartData('Jan', 15),
+      _ChartData('Feb', 30),
+      _ChartData('March', 6.4),
+      _ChartData('April', 14)
+    ];
+    _tooltip = TooltipBehavior(enable: true);
+
+    getUserInfo();
+  }
+
+  void getUserInfo() async {
+    setState(() {
+      loading = true;
+    });
+
+    String userID = Provider.of<EKodi>(context, listen: false).account.userID!;
+
+    await FirebaseFirestore.instance.collection("users").doc(userID).get().then((value) async {
+
+      await context.read<EKodi>().switchUser(Account.fromDocument(value));
+    });
+
+    await FirebaseFirestore.instance.collection('users')
+        .doc(userID)
+        .collection('properties').orderBy("timestamp", descending: true).get().then((documents) {
+      documents.docs.forEach((document) {
+        Property property = Property.fromDocument(document);
+
+        properties.add(property);
+      });
+    });
+
+
+    setState(() {
+      loading = false;
+    });
+
+  }
+
+  addNewProperty() async {
+    //wait for user to add property
+    await Navigator.pushNamed(context, "/addProperty");
+
+    // load property from database
+
+    print("===============1=================");
+
+    await FirebaseFirestore.instance.collection('users')
+        .doc(Provider.of<EKodi>(context, listen: false).account.userID)
+        .collection('properties').orderBy("timestamp", descending: true).get().then((documents) {
+          documents.docs.forEach((document) {
+            Property property = Property.fromDocument(document);
+
+            properties.add(property);
+          });
+    });
+
+    setState(() {
+
+    });
+
+    print("===============2=================");
+
+    print(properties.length);
+  }
 
   displayUserProfile(Account account) {
     return Row(
@@ -44,6 +133,178 @@ class _LandlordDashState extends State<LandlordDash> {
     );
   }
 
+  revenueOverview() {
+    Size size = MediaQuery.of(context).size;
+
+    return Column(
+      children: [
+        ListTile(
+          title: const Text("Property Revenue Overview", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+          subtitle: Row(
+          mainAxisSize: MainAxisSize.min,
+            children: const [
+              Text("Show overview Jan 2022 - May 2022", style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+              SizedBox(width: 5.0,),
+              Text("Detailed Stats >", style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold),),
+            ],
+          ),
+          trailing: RaisedButton.icon(
+            elevation: 0.0,
+            hoverColor: Colors.transparent,
+            color: Colors.deepPurple.shade100,
+            icon: const Icon(Icons.cloud_download_outlined, color: Colors.deepPurple,),
+            label: const Text("Download Report", style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold)),
+            onPressed: () {},
+          )
+        ),
+        SizedBox(
+          height: 30.0,
+          width: size.width,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      height: 30.0,
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(width: 2.0, color: Colors.black),
+                          ),
+                        ),
+                      child: const Text("Overview", style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold),),
+                    ),
+                    const SizedBox(width: 10.0,),
+                    Container(
+                        height: 30.0,
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(width: 2.0, color: Colors.transparent),
+                          ),
+                        ),
+                      child: const Text("Leasing", style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Text("Week", style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                    SizedBox(width: 10.0,),
+                    Text("Month", style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold),),
+                    SizedBox(width: 10.0,),
+                    Text("Year", style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+        Container(height: 1, width: size.width,  color: Colors.grey,),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                //flex: 3,
+                child:  SfCartesianChart(
+                    primaryXAxis: CategoryAxis(),
+                    primaryYAxis: NumericAxis(minimum: 0, maximum: 40, interval: 10),
+                    tooltipBehavior: _tooltip,
+                    series: <ChartSeries<_ChartData, String>>[
+                      ColumnSeries<_ChartData, String>(
+                          dataSource: data,
+                          xValueMapper: (_ChartData data, _) => data.x,
+                          yValueMapper: (_ChartData data, _) => data.y,
+                          name: 'Gold',
+                          color: Color.fromRGBO(8, 142, 255, 1))
+                    ]),
+              ),
+              Column(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      child: Container(
+                        width: size.width*0.12,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.5
+                          )
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("Kes 46,690", style: TextStyle(fontSize: 18.0, color: Colors.deepPurple, fontWeight: FontWeight.bold),),
+                              const SizedBox(width: 20.0,),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text("Money in", style: TextStyle(fontSize: 11.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                                  SizedBox(width: 5.0,),
+                                  Icon(Icons.trending_up_rounded, color: Colors.teal,),
+                                  Text("5.8%", style: TextStyle(fontSize: 11.0, color: Colors.teal, fontWeight: FontWeight.bold),),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child:Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      child: Container(
+                        width: size.width*0.12,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            border: Border.all(
+                                color: Colors.grey,
+                                width: 0.5
+                            )
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("Kes 8,940", style: TextStyle(fontSize: 18.0, color: Colors.orange, fontWeight: FontWeight.bold),),
+                              const SizedBox(width: 20.0,),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text("Money out", style: TextStyle(fontSize: 11.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                                  SizedBox(width: 5.0,),
+                                  Icon(Icons.trending_down_rounded, color: Colors.red,),
+                                  Text("26.4%", style: TextStyle(fontSize: 11.0, color: Colors.red, fontWeight: FontWeight.bold),),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
   displayTab(Size size, SizingInformation sizeInfo) {
     bool isMobile = sizeInfo.isMobile;
 
@@ -58,12 +319,21 @@ class _LandlordDashState extends State<LandlordDash> {
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5.0),
+                      color: properties.isNotEmpty ? Colors.white : Colors.transparent,
+                      boxShadow: properties.isNotEmpty ? [
+                        const BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 1,
+                            spreadRadius: 1.0,
+                            offset: Offset(0.0, 0.0)
+                        )
+                      ] : [],
                       border: Border.all(
                         color: Colors.grey.shade300,
-                        width: 1.0,
+                        width: properties.isNotEmpty ? 0.0 : 1.0,
                       )
                   ),
-                  child: Center(
+                  child: properties.isNotEmpty ? revenueOverview() : Center(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -73,7 +343,7 @@ class _LandlordDashState extends State<LandlordDash> {
                           label: const Text("New Property", style: TextStyle(color: Colors.deepPurple),),
                           color: Colors.deepPurple.shade100,
                           elevation: 0.0,
-                          onPressed: () {},
+                          onPressed: addNewProperty,
                           icon: const Icon(Icons.add, color: Colors.deepPurple,),
                         ),
                       ],
@@ -131,7 +401,7 @@ class _LandlordDashState extends State<LandlordDash> {
                                     flex: 1,
                                     child: Container(
                                       height: 30.0,
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         border: Border(
                                           bottom: BorderSide(width: 2.0, color: Colors.transparent),
                                         ),
@@ -173,7 +443,7 @@ class _LandlordDashState extends State<LandlordDash> {
                               ),
                               Expanded(
                                 child: Center(
-                                  child: PieChart(
+                                  child: pie_chart.PieChart(
                                     dataMap: const {
                                       "<30 days": 8,
                                       "31-60 days": 16,
@@ -188,12 +458,12 @@ class _LandlordDashState extends State<LandlordDash> {
                                       Colors.blueAccent
                                     ],
                                     initialAngleInDegree: 0,
-                                    chartType: ChartType.ring,
+                                    chartType: pie_chart.ChartType.ring,
                                     ringStrokeWidth: 15,
                                     centerText: "46 Properties",
-                                    legendOptions: const LegendOptions(
+                                    legendOptions: const pie_chart.LegendOptions(
                                       showLegendsInRow: true,
-                                      legendPosition: LegendPosition.bottom,
+                                      legendPosition: pie_chart.LegendPosition.bottom,
                                       showLegends: true,
                                       //legendShape: _BoxShape.circle,
                                       legendTextStyle: TextStyle(
@@ -201,7 +471,7 @@ class _LandlordDashState extends State<LandlordDash> {
                                           color: Colors.grey, fontSize: 15.0
                                       ),
                                     ),
-                                    chartValuesOptions: const ChartValuesOptions(
+                                    chartValuesOptions: const pie_chart.ChartValuesOptions(
                                       showChartValueBackground: true,
                                       showChartValues: true,
                                       showChartValuesInPercentage: false,
@@ -284,7 +554,7 @@ class _LandlordDashState extends State<LandlordDash> {
                   label: const Text("New Property", style: TextStyle(color: Colors.white),),
                   color: Colors.teal,
                   elevation: 0.0,
-                  onPressed: () {},
+                  onPressed: addNewProperty,
                   icon: const Icon(Icons.add, color: Colors.white,),
                 ),
               ),
@@ -302,7 +572,11 @@ class _LandlordDashState extends State<LandlordDash> {
               const SizedBox(width: 20.0,),
             ],
           ),
-          body: Column(
+          body:  loading ? Container(
+              height: size.height,
+              width: size.width,
+              color: Colors.white,
+              child: Center(child: Image.asset("assets/loading.gif"),)) : Column(
             children: [
               Container(
                 width: size.width,

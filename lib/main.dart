@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rekodi/config.dart';
 import 'package:rekodi/model/account.dart';
+import 'package:rekodi/pages/addProperty.dart';
 import 'package:rekodi/pages/dashboards/dashboard.dart';
 import 'package:rekodi/pages/home.dart';
 import 'package:rekodi/pages/authPage.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         "/auth": (context) => const AuthPage(),
         "/dashboard": (context) => const Dashboard(),
         "/selectAccount": (context) => const SelectAccount(),
+        "/addProperty": (context)=> const AddProperty(),
       },
     );
   }

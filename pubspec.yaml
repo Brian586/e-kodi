@@ -48,6 +48,8 @@ dependencies:
   dropdown_search: ^2.0.1
   fluttertoast: ^8.0.9
   pie_chart: ^5.3.0
+  uuid: ^3.0.6
+  syncfusion_flutter_charts: ^20.1.48
 
 
 dev_dependencies:
