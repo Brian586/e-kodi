@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ import 'package:responsive_builder/responsive_builder.dart';
 
 import '../auth/auth.dart';
 import '../dialog/errorDialog.dart';
+import '../widgets/customTextField.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);
@@ -21,6 +23,12 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
 
   bool isSignUp = false;
+  TextEditingController name =  TextEditingController();
+  TextEditingController phone =  TextEditingController();
+  TextEditingController email =  TextEditingController();
+  TextEditingController password =  TextEditingController();
+  TextEditingController cPassword =  TextEditingController();
+  String accountType = 'Tenant';
 
   double getWidth(Size size, SizingInformation sizeInfo) {
     if(sizeInfo.isMobile)
@@ -37,8 +45,27 @@ class _AuthPageState extends State<AuthPage> {
     }
   }
 
-  void handleAuth(String? authType) async {
-    String res = await Authentication().performAuthentication(context, authType!, isSignUp);
+  void handleAuth(BuildContext context) async {
+    await context.read<Loader>().switchLoadingState(true);
+
+    String res = "";//await Authentication().performAuthentication(context,/* authType!,*/ isSignUp);
+
+    if(isSignUp) {
+      res = await Authentication().createUserWithEmail(
+        name: name.text.trim(),
+        email: email.text.trim(),
+        password: password.text.trim(),
+        phone: phone.text.trim(),
+        accountType: accountType,
+      );
+    }
+    else
+      {
+        res = await Authentication().loginUserWithEmail(
+          email: email.text.trim(),
+          password: password.text.trim(),
+        );
+      }
 
     await context.read<Loader>().switchLoadingState(false);
 
@@ -49,11 +76,6 @@ class _AuthPageState extends State<AuthPage> {
 
         context.read<EKodi>().switchUser(account);
       });
-
-      if(isSignUp)
-        {
-          await Navigator.pushNamed(context, "/selectAccount");
-        }
 
       Navigator.pushReplacementNamed(context, "/dashboard");
     }
@@ -131,77 +153,149 @@ class _AuthPageState extends State<AuthPage> {
                           padding: const EdgeInsets.all(20.0),
                           child: Text("Welcome to e-Kodi Property Management Software", textAlign: TextAlign.center, maxLines: null, style: GoogleFonts.baloo2(fontWeight: FontWeight.w600, fontSize: 22.0,)),
                         ),
-                        Text(isSignUp ? "Sign Up" : "Log In",style: GoogleFonts.baloo2(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, fontSize: 22.0,)),
-                        AccountButton(
-                          icon: "assets/google.png",
-                          title: "Continue with Google",
-                          authType: "google",
-                          isSignUp: isSignUp,
-                          onTap: ()=> handleAuth("google"),
-                        ),
-                        AccountButton(
-                          icon: "assets/fb.png",
-                          title: "Continue with Facebook",
-                          authType: "facebook",
-                          isSignUp: isSignUp,
-                          onTap: ()=> handleAuth("facebook"),
-                        ),
-                        AccountButton(
-                          icon: "assets/apple.png",
-                          title: "Continue with Apple",
-                          authType: "apple",
-                          isSignUp: isSignUp,
-                          onTap: ()=> handleAuth("apple"),
-                        ),
-                        AccountButton(
-                          icon: "assets/email.png",
-                          title: "Continue with Mail",
-                          authType: "mail",
-                          isSignUp: isSignUp,
-                          onTap: ()=> handleAuth("mail"),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: isSignUp ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text("Already have an Account? ", textAlign: TextAlign.center, style: GoogleFonts.baloo2(fontSize: 16.0,)),
-                              const SizedBox(width: 5.0,),
-                              RaisedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isSignUp = false;
-                                  });
-                                },
+                        Text(isSignUp ? "Create Account" : "Log In",style: GoogleFonts.baloo2(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, fontSize: 22.0,)),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: isSignUp ? [
+                            AuthTextField(
+                              controller: name,
+                              prefixIcon: const Icon(Icons.person, color: Colors.grey,),
+                              hintText: "Username",
+                              isObscure: false,
+                              inputType: TextInputType.name,
+                            ),
+                            AuthTextField(
+                              controller: phone,
+                              prefixIcon: const Icon(Icons.phone, color: Colors.grey,),
+                              hintText: "Phone (+254)",
+                              isObscure: false,
+                              inputType: TextInputType.phone,
+                            ),
+                            AuthTextField(
+                              controller: email,
+                              prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey,),
+                              hintText: "Email Address",
+                              isObscure: false,
+                              inputType: TextInputType.emailAddress,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text("Continue as...", textAlign: TextAlign.start, style: GoogleFonts.baloo2(fontSize: 16.0,)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+                              child: DropdownSearch<String>(
+                                  mode: Mode.MENU,
+                                  showSelectedItems: true,
+                                  items: const ["Landlord", "Tenant", "Agent", "Service Provider"],
+                                  hint: "Continue as...",
+                                  onChanged: (v) {
+                                    setState(() {
+                                      accountType = v!;
+                                    });
+                                  },
+                                  selectedItem: "Tenant"),
+                            ),
+                            AuthTextField(
+                              controller: password,
+                              prefixIcon: const Icon(Icons.lock_outline_rounded, color: Colors.grey,),
+                              hintText: "Password",
+                              isObscure: true,
+                              inputType: TextInputType.visiblePassword,
+                            ),
+                            AuthTextField(
+                              controller: cPassword,
+                              prefixIcon: const Icon(Icons.lock_outline_rounded, color: Colors.grey,),
+                              hintText: "Confirm Password",
+                              isObscure: true,
+                              inputType: TextInputType.visiblePassword,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: RaisedButton.icon(
+                                onPressed: ()=> handleAuth(context),
                                 color: Theme.of(context).primaryColor,
                                 elevation: 5.0,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30.0)
                                 ),
-                                child: Text("Log In", style: GoogleFonts.baloo2(color: Colors.white)),
+                                label: Text("Create", style: GoogleFonts.baloo2(color: Colors.white)),
+                                icon: const Icon(Icons.done, color: Colors.white,),
                               ),
-                            ],
-                          ) : Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text("Don't have an Account? ", textAlign: TextAlign.center, style: GoogleFonts.baloo2(fontSize: 16.0,)),
-                              const SizedBox(width: 5.0,),
-                              RaisedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isSignUp = true;
-                                  });
-                                },
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("Already have an Account? ", textAlign: TextAlign.center, style: GoogleFonts.baloo2(fontSize: 16.0,)),
+                                  const SizedBox(width: 5.0,),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        isSignUp = false;
+                                        name.clear();
+                                        phone.clear();
+                                        email.clear();
+                                        password.clear();
+                                        cPassword.clear();
+                                      });
+                                    },
+                                    child: Text("Log In", style: GoogleFonts.baloo2(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ] : [
+                            AuthTextField(
+                              controller: email,
+                              prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey,),
+                              hintText: "Email Address",
+                              isObscure: false,
+                              inputType: TextInputType.emailAddress,
+                            ),
+                            AuthTextField(
+                              controller: password,
+                              prefixIcon: const Icon(Icons.lock_open, color: Colors.grey,),
+                              hintText: "Password",
+                              isObscure: true,
+                              inputType: TextInputType.visiblePassword,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: RaisedButton.icon(
+                                onPressed: ()=> handleAuth(context),
                                 color: Theme.of(context).primaryColor,
                                 elevation: 5.0,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30.0)
                                 ),
-                                child: Text("Sign Up", style: GoogleFonts.baloo2(color: Colors.white)),
+                                label: Text("Login", style: GoogleFonts.baloo2(color: Colors.white)),
+                                icon: const Icon(Icons.done, color: Colors.white,),
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("Don't have an Account? ", textAlign: TextAlign.center, style: GoogleFonts.baloo2(fontSize: 16.0,)),
+                                  const SizedBox(width: 5.0,),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        isSignUp = true;
+                                        email.clear();
+                                        password.clear();
+                                      });
+                                    },
+                                    child: Text("Create", style: GoogleFonts.baloo2(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),

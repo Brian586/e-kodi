@@ -228,7 +228,7 @@ class Authentication {
         // do something else
           return "";
         case "mail":
-          String res = await  loginUserWithEmail(context);
+          String res = await  loginUserWithEmail();
 
           return res;
       }
@@ -241,67 +241,12 @@ class Authentication {
     return "success+${account.userID}";
   }
 
-  Future<String> loginUserWithEmail(BuildContext context) async {
-    TextEditingController _email = TextEditingController();
-    TextEditingController _password = TextEditingController();
-
-    //TODO: Display popup to take data
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return ResponsiveBuilder(
-          builder: (context, sizeInfo) {
-            Size size = MediaQuery.of(context).size;
-            bool isMobile = sizeInfo.isMobile;
-            bool isTablet = sizeInfo.isTablet;
-
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 7.0 : isTablet ? size.width*0.1 : size.width*0.25),
-              child: AlertDialog(
-                title: const Text('Continue with Email'),
-                content: SingleChildScrollView(
-                  child: ListBody(
-                    children: <Widget>[
-                      CustomTextField(
-                        controller: _email,
-                        hintText: "Email",
-                      ),
-                      CustomTextField(
-                        controller: _password,
-                        hintText: "Password",
-                      ),
-                    ],
-                  ),
-                ),
-                actions: <Widget>[
-                  RaisedButton.icon(
-                    color: Colors.red,
-                    icon: const Icon(Icons.done_rounded, color: Colors.white,),
-                    label: const Text('Proceed', style: TextStyle(color: Colors.white)),
-                    onPressed: () {
-                      if(_email.text.isNotEmpty
-                          && _password.text.isNotEmpty
-                      )
-                      {
-                        context.read<Loader>().switchLoadingState(true);
-
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
+  Future<String> loginUserWithEmail({String? email, String? password}) async {
 
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _email.text.trim(),
-        password: _password.text.trim(),
+        email: email!,
+        password: password!,
       );
 
       String userID = credential.user!.uid;
@@ -323,6 +268,8 @@ class Authentication {
         email: email!,
         password: password!,
       );
+
+      await credential.user?.sendEmailVerification();
 
       Account account = Account(
         name: name!,

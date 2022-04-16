@@ -12,7 +12,7 @@ import 'package:rekodi/pages/addProperty.dart';
 import 'package:rekodi/pages/dashboards/dashboard.dart';
 import 'package:rekodi/pages/home.dart';
 import 'package:rekodi/pages/authPage.dart';
-import 'package:rekodi/pages/selectAccount.dart';
+import 'package:rekodi/pages/properties.dart';
 import 'package:rekodi/providers/loader.dart';
 // Import the generated file
 import 'firebase_options.dart';
@@ -52,8 +52,8 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         "/auth": (context) => const AuthPage(),
         "/dashboard": (context) => const Dashboard(),
-        "/selectAccount": (context) => const SelectAccount(),
         "/addProperty": (context)=> const AddProperty(),
+        "/properties": (context) => const Properties()
       },
     );
   }

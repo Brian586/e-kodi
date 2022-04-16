@@ -10,21 +10,21 @@ List<Service> services = [
   Service(
     name: "Dashboards & Reporting",
     icon: "assets/images/service_icon_01.png",
-    description: "We offer fully customizable dashboards to track all the key performance indicators, manage income and maintenance costs for your properties through key metrics",
+    description: "Customize your dashboards to track all the key performance indicators,  manage income and maintenance costs of your properties through key metrics. Know where your business stands at all times by aggregating your accounts into a single master statement. Our software flags any discrepancies, minimising the risk of errors and fraud.",
   ),
   Service(
     name: "Centralised Data",
     icon: "assets/images/service_icon_02.png",
-    description: "We bring together all of your customer and property data into one location for a quick generation of receipts, accessible in real-time in the office or out.",
+    description: "Harmonize all your customer and property data into one location for quick generation of receipts, accessible in real time in and out of your office.",
   ),
   Service(
     name: "Analytics",
     icon: "assets/images/service_icon_03.png",
-    description: "We help you track your balance sheet figures like revenue, repair costs, and rent arrears to view performance insights of your financial data",
+    description: "Remove the guess work, tiresome excel sheets and risk involved in poor record keeping. Our sophisticated software analyzes all your property records including but not limited to revenue, repair cost, and rent areas to give performance insight to your financial data.",
   ),
   Service(
-    name: "Free online tenant payment",
+    name: "Free Rent Collection",
     icon: "assets/images/service_icon_04.png",
-    description: "We automate your rent collection process with with ZERO transaction cost, secure online rent payments for your tenants",
+    description: "Automate your rent collection process with no additional transaction cost.",
   )
 ];

@@ -320,7 +320,7 @@ class _HomeMobileState extends State<HomeMobile> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Text("Feel Free To Send Us a Message About Your Website Needs", textAlign: TextAlign.center, maxLines: null, style: GoogleFonts.baloo2(fontWeight: FontWeight.w600, fontSize: 22.0,)),
+                      child: Text("Feel Free To Send Us a Message, Feedback & Suggestions", textAlign: TextAlign.center, maxLines: null, style: GoogleFonts.baloo2(fontWeight: FontWeight.w600, fontSize: 22.0,)),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -332,7 +332,7 @@ class _HomeMobileState extends State<HomeMobile> {
                       children: [
                         const Icon(Icons.local_phone_rounded, color: Colors.white,),
                         const SizedBox(width: 10.0,),
-                        Text("+254-797-383-995", maxLines: null, style: GoogleFonts.baloo2(color: Colors.white,  fontSize: 20.0,)),
+                        Text("+254701518100", maxLines: null, style: GoogleFonts.baloo2(color: Colors.white,  fontSize: 20.0,)),
                       ],
                     ),
                     const SizedBox(height: 10.0,),
@@ -460,7 +460,7 @@ class _HomeTabletState extends State<HomeTablet> {
                         const Text("WELCOME TO e-KODI"),
                         const SizedBox(height: 10.0,),
                         RichText(
-                          textScaleFactor: 4.0,
+                          textScaleFactor: 3.0,
                           textAlign: TextAlign.center,
                           text: TextSpan(
                             children: <TextSpan>[
@@ -887,13 +887,13 @@ class _HomeDesktopState extends State<HomeDesktop> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset("assets/images/about-left-image.png", width: size.width*0.4, ),
+                    Image.asset("assets/images/about-left-image.png", width: size.width*0.25, ),
                     Expanded(
                       child: SizedBox(
-                        height: size.height*0.5,
+                        height: size.height*0.7,
                         child: GridView.count(
                           crossAxisCount: 2,
-                          childAspectRatio: size.width*0.2/250.0,
+                          childAspectRatio: size.width*0.2/200.0,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           children: List.generate(myServices.services.length, (index) {
@@ -1133,7 +1133,7 @@ class _HomeDesktopState extends State<HomeDesktop> {
                         children: [
                           SizedBox(
                             width: size.width*0.4,
-                            height: size.height*0.4,
+                            height: size.height*0.45,
                           ),
                           Positioned(
                             bottom: 0.0,

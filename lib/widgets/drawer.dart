@@ -9,25 +9,43 @@ class CustomDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-          TextButton(
-            onPressed: () {},
-            child: Text("Home", style: GoogleFonts.baloo2()),
+          DrawerHeader(
+            child: Center(
+              child: RichText(
+                text: TextSpan(
+                  //style: DefaultTextStyle.of(context).style,
+                  children: <TextSpan>[
+                    TextSpan(text: 'e-', style: GoogleFonts.titanOne(color: Colors.blue, fontSize: 20.0)),
+                    TextSpan(text: 'KODI', style: GoogleFonts.titanOne(color: Colors.red, fontSize: 20.0)),
+                  ],
+                ),
+              ),
+            ),
           ),
-          TextButton(
-            onPressed: () {},
-            child: Text("Services", style: GoogleFonts.baloo2()),
+          ListTile(
+            onTap: () {},
+            leading: Icon(Icons.home, color: Colors.grey,),
+            title: Text("Home", style: GoogleFonts.baloo2()),
           ),
-          TextButton(
-            onPressed: () {},
-            child: Text("Why Us", style: GoogleFonts.baloo2()),
+          ListTile(
+            onTap: () {},
+            leading: Icon(Icons.engineering_outlined, color: Colors.grey,),
+            title: Text("Services", style: GoogleFonts.baloo2()),
           ),
-          TextButton(
-            onPressed: () {},
-            child: Text("Features", style: GoogleFonts.baloo2()),
+          ListTile(
+            onTap: () {},
+            leading: Icon(Icons.live_help_outlined, color: Colors.grey,),
+            title: Text("Why Us", style: GoogleFonts.baloo2()),
           ),
-          TextButton(
-            onPressed: () {},
-            child: Text("Contact", style: GoogleFonts.baloo2()),
+          ListTile(
+            onTap: () {},
+            leading: Icon(Icons.auto_awesome, color: Colors.grey,),
+            title: Text("Features", style: GoogleFonts.baloo2()),
+          ),
+          ListTile(
+            onTap: () {},
+            leading: Icon(Icons.support_agent, color: Colors.grey,),
+            title: Text("Contact", style: GoogleFonts.baloo2()),
           ),
           Padding(
             padding: const EdgeInsets.all(10.0),

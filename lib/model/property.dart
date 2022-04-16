@@ -10,10 +10,11 @@ class Property {
   final String? town;
   final String? notes;
   final int? timestamp;
+  final String? publisherID;
 
 
   Property(
-      {this.name, this.timestamp, this.propertyID, this.country, this.city, this.town, this.address, this.units, this.notes});
+      {this.name, this.timestamp, this.publisherID, this.propertyID, this.country, this.city, this.town, this.address, this.units, this.notes});
 
   Map<String, dynamic> toMap() {
     return {
@@ -26,6 +27,7 @@ class Property {
       "units": units,
       "notes": notes,
       "timestamp": timestamp,
+      "publisherID": publisherID
     };
   }
 
@@ -40,6 +42,7 @@ class Property {
       units: doc.get("units") ?? "",
       notes: doc.get("notes") ?? "",
       timestamp: doc.get("timestamp") ?? "",
+      publisherID: doc.get("publishw")
     );
   }
 }

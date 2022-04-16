@@ -171,3 +171,48 @@ class _MyTextFieldState extends State<MyTextField> {
     );
   }
 }
+
+
+
+class AuthTextField extends StatelessWidget {
+  final TextEditingController? controller;
+  final Widget? prefixIcon;
+  final String? hintText;
+  final bool? isObscure;
+  final TextInputType? inputType;
+
+  const AuthTextField({Key? key, this.controller, this.prefixIcon, this.hintText, this.isObscure, this.inputType}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container
+      (
+      decoration: const BoxDecoration(
+        // color: Colors.grey.withOpacity(0.3),
+        // borderRadius: BorderRadius.circular(30.0),
+      ),
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(10.0),
+      child: TextFormField(
+        controller: controller,
+        obscureText: isObscure!,
+        keyboardType: inputType,
+        cursorColor: Theme.of(context).primaryColor,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30.0),
+              borderSide: const BorderSide(
+                width: 1.0,
+              )
+          ),
+          prefixIcon: prefixIcon,
+          focusColor: Theme.of(context).primaryColor,
+          hintText: hintText,
+          labelText: hintText,
+          hintStyle: const TextStyle(color: Colors.grey),
+        ),
+      ),
+    );
+  }
+}
+
