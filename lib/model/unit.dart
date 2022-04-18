@@ -7,8 +7,10 @@ class Unit {
   final String? tenantID;
   final bool? isOccupied;
   final int? price;
+  final int? dueDate;
+  final String? propertyID;
 
-  Unit({this.name,this.tenantID, this.price, this.isOccupied, this.unitID, this.description});
+  Unit({this.name,this.tenantID, this.price, this.propertyID, this.dueDate, this.isOccupied, this.unitID, this.description});
 
   Map<String, dynamic> toMap() {
     return {
@@ -18,6 +20,8 @@ class Unit {
       "tenantID": tenantID,
       "isOccupied": isOccupied,
       "price": price,
+      "dueDate": dueDate,
+      "propertyID": propertyID,
     };
   }
 
@@ -29,6 +33,8 @@ class Unit {
       tenantID: doc.get("tenantID") ?? "",
       isOccupied: doc.get("isOccupied") ?? "",
       price: doc.get("price") ?? "",
+      dueDate: doc.get("dueDate") ?? "",
+      propertyID: doc.get("propertyID") ?? ""
     );
   }
 }

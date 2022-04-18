@@ -13,6 +13,8 @@ import 'package:rekodi/pages/dashboards/dashboard.dart';
 import 'package:rekodi/pages/home.dart';
 import 'package:rekodi/pages/authPage.dart';
 import 'package:rekodi/pages/properties.dart';
+import 'package:rekodi/pages/propertyDetails.dart';
+import 'package:rekodi/providers/datePeriod.dart';
 import 'package:rekodi/providers/loader.dart';
 // Import the generated file
 import 'firebase_options.dart';
@@ -28,7 +30,8 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<EKodi>(create: (_)=> EKodi(),),
-      ChangeNotifierProvider<Loader>(create: (_)=> Loader())
+      ChangeNotifierProvider<Loader>(create: (_)=> Loader()),
+      ChangeNotifierProvider<DatePeriodProvider>(create: (_)=> DatePeriodProvider())
     ],
     child: const MyApp(),
   ));
@@ -53,7 +56,8 @@ class MyApp extends StatelessWidget {
         "/auth": (context) => const AuthPage(),
         "/dashboard": (context) => const Dashboard(),
         "/addProperty": (context)=> const AddProperty(),
-        "/properties": (context) => const Properties()
+        "/properties": (context) => const Properties(),
+        "/property_details": (context) => const PropertyDetails()
       },
     );
   }

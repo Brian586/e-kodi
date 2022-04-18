@@ -125,18 +125,18 @@ class _MyTextFieldState extends State<MyTextField> {
             Container(
               width: widget.width,
               height: 35.0,
-              decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(5.0),
-                  boxShadow: [
-                    BoxShadow(
-                        offset: const Offset(0, 0),
-                        spreadRadius: 3.0,
-                        //blurRadius: 3.0,
-                        color: isSelected ? Colors.grey.shade400 : Colors.transparent
-                    )
-                  ]
-              ),
+              // decoration: BoxDecoration(
+              //     color: isSelected ? Colors.white : Theme.of(context).scaffoldBackgroundColor,
+              //     borderRadius: BorderRadius.circular(30.0),
+              //     boxShadow: [
+              //       BoxShadow(
+              //           offset: const Offset(0, 0),
+              //           spreadRadius: 3.0,
+              //           //blurRadius: 3.0,
+              //           color: isSelected ? Colors.grey.shade400 : Colors.transparent
+              //       )
+              //     ]
+              // ),
               child: FocusScope(
                 onFocusChange: (v) {
                   setState(() {
@@ -158,7 +158,7 @@ class _MyTextFieldState extends State<MyTextField> {
                     //prefixIcon: prefixIcon,
                     focusColor: Theme.of(context).primaryColor,
                     hintText: widget.hintText,
-                    labelText: widget.hintText,
+                    //labelText: widget.hintText,
                     hintStyle: const TextStyle(color: Colors.grey),
                   ),
                 ),

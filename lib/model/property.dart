@@ -42,7 +42,7 @@ class Property {
       units: doc.get("units") ?? "",
       notes: doc.get("notes") ?? "",
       timestamp: doc.get("timestamp") ?? "",
-      publisherID: doc.get("publishw")
+      publisherID: doc.get("publisherID") ?? "",
     );
   }
 }

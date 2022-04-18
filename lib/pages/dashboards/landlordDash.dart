@@ -3,16 +3,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart' as pie_chart;
 import 'package:provider/provider.dart';
 import 'package:rekodi/model/property.dart';
 import 'package:rekodi/model/tabItem.dart';
+import 'package:rekodi/providers/datePeriod.dart';
 import 'package:rekodi/widgets/customTextField.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../config.dart';
 import '../../model/account.dart';
+import '../../model/unit.dart';
 
 class _ChartData {
   _ChartData({this.x, this.y1, this.y2});
@@ -40,6 +44,7 @@ class _LandlordDashState extends State<LandlordDash> {
   TooltipBehavior? _tooltipBehavior;
   final double _columnWidth = 0.8;
   final double _columnSpacing = 0.2;
+  List<Unit> allUnits = [];
 
 
   @override
@@ -72,10 +77,20 @@ class _LandlordDashState extends State<LandlordDash> {
 
     await FirebaseFirestore.instance.collection('properties')
         .where("publisherID", isEqualTo: userID).orderBy("timestamp", descending: true).get().then((documents) {
-      documents.docs.forEach((document) {
+      documents.docs.forEach((document) async {
         Property property = Property.fromDocument(document);
 
         properties.add(property);
+
+        await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
+          value.docs.forEach((unitDoc) {
+            Unit unit = Unit.fromDocument(unitDoc);
+
+            allUnits.add(unit);
+          });
+        });
+
+
       });
     });
 
@@ -90,16 +105,27 @@ class _LandlordDashState extends State<LandlordDash> {
     //wait for user to add property
     await Navigator.pushNamed(context, "/addProperty");
 
+    String userID = Provider.of<EKodi>(context, listen: false).account.userID!;
+
     // load property from database
 
-    await FirebaseFirestore.instance.collection('users')
-        .doc(Provider.of<EKodi>(context, listen: false).account.userID)
-        .collection('properties').orderBy("timestamp", descending: true).get().then((documents) {
-          documents.docs.forEach((document) {
-            Property property = Property.fromDocument(document);
+    await FirebaseFirestore.instance.collection('properties')
+        .where("publisherID", isEqualTo: userID).orderBy("timestamp", descending: true).get().then((documents) {
+      documents.docs.forEach((document) async {
+        Property property = Property.fromDocument(document);
 
-            properties.add(property);
+        properties.add(property);
+
+        await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
+          value.docs.forEach((unitDoc) {
+            Unit unit = Unit.fromDocument(unitDoc);
+
+            allUnits.add(unit);
           });
+        });
+
+
+      });
     });
 
     setState(() {
@@ -211,8 +237,13 @@ class _LandlordDashState extends State<LandlordDash> {
     super.dispose();
   }
 
-  revenueOverview() {
+  revenueOverview({int? startDate, int? endDate}) {
     Size size = MediaQuery.of(context).size;
+
+    String start = DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(startDate!));
+
+    String end = DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(endDate!));
+
 
     return Column(
       children: [
@@ -220,10 +251,10 @@ class _LandlordDashState extends State<LandlordDash> {
           title: const Text("Property Revenue Overview", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
           subtitle: Row(
           mainAxisSize: MainAxisSize.min,
-            children: const [
-              Text("Show overview Jan 2022 - May 2022", style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),),
-              SizedBox(width: 5.0,),
-              Text("Detailed Stats >", style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold),),
+            children: [
+              Text("$start - $end", style: const TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+              const SizedBox(width: 5.0,),
+              const Text("Detailed Stats >", style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold),),
             ],
           ),
           trailing: RaisedButton.icon(
@@ -372,7 +403,7 @@ class _LandlordDashState extends State<LandlordDash> {
     );
   }
 
-  displayTab(Size size, SizingInformation sizeInfo) {
+  displayTab(Size size, SizingInformation sizeInfo, {int? start, int? end}) {
     bool isMobile = sizeInfo.isMobile;
 
     switch (selected) {
@@ -400,7 +431,7 @@ class _LandlordDashState extends State<LandlordDash> {
                         width: properties.isNotEmpty ? 0.0 : 1.0,
                       )
                   ),
-                  child: properties.isNotEmpty ? revenueOverview() : Center(
+                  child: properties.isNotEmpty ? revenueOverview(startDate: start, endDate: end) : Center(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -574,14 +605,131 @@ class _LandlordDashState extends State<LandlordDash> {
     }
   }
 
+  void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+    /// The argument value will return the changed date as [DateTime] when the
+    /// widget [SfDateRangeSelectionMode] set as single.
+    ///
+    /// The argument value will return the changed dates as [List<DateTime>]
+    /// when the widget [SfDateRangeSelectionMode] set as multiple.
+    ///
+    /// The argument value will return the changed range as [PickerDateRange]
+    /// when the widget [SfDateRangeSelectionMode] set as range.
+    ///
+    /// The argument value will return the changed ranges as
+    /// [List<PickerDateRange] when the widget [SfDateRangeSelectionMode] set as
+    /// multi range.
+    setState(() {
+      if (args.value is PickerDateRange) {
+        // String _range = '${DateFormat('dd/MM/yyyy').format(args.value.startDate)} -'
+        // // ignore: lines_longer_than_80_chars
+        //     ' ${DateFormat('dd/MM/yyyy').format(args.value.endDate ?? args.value.startDate)}';
+
+        context.read<DatePeriodProvider>().updatePeriod(
+          start: args.value.startDate.millisecondsSinceEpoch, end: args.value.endDate.millisecondsSinceEpoch ?? DateTime.fromMillisecondsSinceEpoch(args.value.startDate.millisecondsSinceEpoch).subtract(const Duration(days: 30)) );
+      }
+      // else if (args.value is DateTime) {
+      //   _selectedDate = args.value.toString();
+      // } else if (args.value is List<DateTime>) {
+      //   _dateCount = args.value.length.toString();
+      // } else {
+      //   _rangeCount = args.value.length.toString();
+      // }
+    });
+  }
+
+  displayCalendar(int startDate, int endDate) {
+    Size size = MediaQuery.of(context).size;
+    
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      // false = user must tap button, true = tap outside dialog
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text("Pick range"),
+          content: Container(
+            height: size.height*0.6,
+            width: size.width*0.4,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20.0)
+            ),
+            child: SfDateRangePicker(
+              view: DateRangePickerView.month,
+              onSelectionChanged: _onSelectionChanged,
+              enableMultiView: true,
+              selectionMode: DateRangePickerSelectionMode.range,
+              initialSelectedRange: PickerDateRange(
+                  DateTime.fromMillisecondsSinceEpoch(startDate),
+                  DateTime.fromMillisecondsSinceEpoch(endDate)
+              ),
+            ),
+          ),
+          actions: [
+            TextButton.icon(
+              onPressed: () {Navigator.pop(context);},
+              icon: Icon(Icons.done, color: Theme.of(context).primaryColor),
+              label: Text("Done", style: TextStyle(color: Theme.of(context).primaryColor),),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Widget dateSelector({int? startDate, int? endDate}) {
+
+    String start = DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(startDate!));
+
+    String end = DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(endDate!));
+
+    return InkWell(
+      onTap: () => displayCalendar(startDate, endDate),
+      child: Container(
+        height: 30.0,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(3.0),
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 1,
+                  spreadRadius: 1.0,
+                  offset: Offset(0.0, 0.0)
+              )
+            ],
+            border: Border.all(width: 0.5, color: Colors.grey.shade300)
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.date_range_rounded, color: Colors.grey,size: 15.0,),
+              const SizedBox(width: 5.0,),
+              Text("$start - $end", style: const TextStyle(color: Colors.grey, fontSize: 13.0, fontWeight: FontWeight.bold),),
+              const SizedBox(width: 5.0,),
+              const Icon(Icons.arrow_drop_down, color: Colors.grey,),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Account account = context.watch<EKodi>().account;
+    int startDate = context.watch<DatePeriodProvider>().startDate;
+    int endDate = context.watch<DatePeriodProvider>().endDate;
+
     Size size = MediaQuery.of(context).size;
 
     return ResponsiveBuilder(
       builder: (context, sizeInfo) {
         bool isDesktop = sizeInfo.isDesktop;
+        int vacant = allUnits.where((unit) => unit.isOccupied == false).toList().length;
+        int occupied = allUnits.where((unit) => unit.isOccupied == true).toList().length;
 
         return Scaffold(
           backgroundColor: Colors.grey.shade50,
@@ -734,35 +882,7 @@ class _LandlordDashState extends State<LandlordDash> {
                           Text("Hi ${account.name!}, Welcome to e-Ekodi", style: TextStyle(color: Colors.grey, fontSize: 13.0, fontWeight: FontWeight.bold),)
                         ],
                       ),
-                      Container(
-                        height: 30.0,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3.0),
-                            color: Colors.white,
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 1,
-                                  spreadRadius: 1.0,
-                                  offset: Offset(0.0, 0.0)
-                              )
-                            ],
-                            border: Border.all(width: 0.5, color: Colors.grey.shade300)
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.date_range_rounded, color: Colors.grey,size: 15.0,),
-                              SizedBox(width: 5.0,),
-                              Text("Jan 2022 - Apr 2022", style: TextStyle(color: Colors.grey, fontSize: 13.0, fontWeight: FontWeight.bold),),
-                              SizedBox(width: 5.0,),
-                              Icon(Icons.arrow_drop_down, color: Colors.grey,),
-                            ],
-                          ),
-                        ),
-                      )
+                      dateSelector(startDate: startDate, endDate: endDate)
                     ],
                   ),
                 ),
@@ -777,7 +897,7 @@ class _LandlordDashState extends State<LandlordDash> {
                         child: SizedBox(
                           width: size.width,
                           height: size.height,
-                          child: displayTab(size, sizeInfo),
+                          child: displayTab(size, sizeInfo, start: startDate, end: endDate),
                         ),
                       ),
                       Expanded(
@@ -834,32 +954,32 @@ class _LandlordDashState extends State<LandlordDash> {
                                               Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: const [
-                                                  Text("8", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
-                                                  SizedBox(height: 5.0,),
-                                                  Text("Vacant", style: TextStyle(fontSize: 15.0,  color: Colors.grey, fontWeight: FontWeight.bold),),
+                                                children: [
+                                                  Text(vacant.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+                                                  const SizedBox(height: 5.0,),
+                                                  const Text("Vacant", style: TextStyle(fontSize: 15.0,  color: Colors.grey, fontWeight: FontWeight.bold),),
                                                 ],
                                               ),
                                               const VerticalDivider(width: 1.0,),
                                               Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: const [
-                                                  Text("64", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
-                                                  SizedBox(height: 5.0,),
-                                                  Text("Occupied", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                                                children: [
+                                                  Text(occupied.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+                                                  const SizedBox(height: 5.0,),
+                                                  const Text("Occupied", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
                                                 ],
                                               ),
-                                              const VerticalDivider(width: 1.0,),
-                                              Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: const [
-                                                  Text("16", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
-                                                  SizedBox(height: 5.0,),
-                                                  Text("Unlisted", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
-                                                ],
-                                              ),
+                                              // const VerticalDivider(width: 1.0,),
+                                              // Column(
+                                              //   mainAxisSize: MainAxisSize.min,
+                                              //   crossAxisAlignment: CrossAxisAlignment.center,
+                                              //   children: const [
+                                              //     Text("16", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+                                              //     SizedBox(height: 5.0,),
+                                              //     Text("Unlisted", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                                              //   ],
+                                              // ),
                                             ],
                                           ),
                                         ),

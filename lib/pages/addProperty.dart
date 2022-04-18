@@ -84,7 +84,9 @@ class _AddPropertyState extends State<AddProperty> {
                 description: notes.text.trim(),
                 tenantID: "",
                 isOccupied: false,
-                price: 0
+                price: 0,
+                dueDate: 0,
+                propertyID: property.propertyID,
               );
 
               await FirebaseFirestore.instance.collection('properties').doc(property.propertyID)
@@ -311,6 +313,8 @@ class _AddPropertyState extends State<AddProperty> {
                                                   tenantID: "",
                                                   isOccupied: false,
                                                   price: 0,
+                                                  dueDate: 0,
+                                                  propertyID: propertyID
                                                 ));
 
                                                 setState(() {
@@ -357,6 +361,7 @@ class _AddPropertyState extends State<AddProperty> {
                                   hintText: "Notes",
                                   width:  size.width,
                                   title: "Notes",
+                                  inputType: TextInputType.multiline,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(20.0),

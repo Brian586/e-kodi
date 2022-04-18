@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rekodi/model/property.dart';
+import 'package:rekodi/widgets/customTextField.dart';
 
 import '../config.dart';
 import '../model/account.dart';
+import '../model/unit.dart';
 
 
 class Properties extends StatefulWidget {
@@ -16,7 +18,56 @@ class Properties extends StatefulWidget {
 }
 
 class _PropertiesState extends State<Properties> {
+  TextEditingController controller = TextEditingController();
+  bool loading = false;
+  List<Property> properties = [];
+  List<Unit> allUnits = [];
 
+
+  @override
+  void initState() {
+    super.initState();
+
+    getProperties();
+  }
+
+  void getProperties() async {
+    setState(() {
+      loading = true;
+    });
+
+    String userID = Provider.of<EKodi>(context, listen: false).account.userID!;
+
+    await FirebaseFirestore.instance.collection("users").doc(userID).get().then((value) async {
+
+      await context.read<EKodi>().switchUser(Account.fromDocument(value));
+    });
+
+    await FirebaseFirestore.instance.collection('properties')
+        .where("publisherID", isEqualTo: userID).orderBy("timestamp", descending: true).get().then((documents) {
+      documents.docs.forEach((document) async {
+        Property property = Property.fromDocument(document);
+
+        properties.add(property);
+
+        await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
+          value.docs.forEach((unitDoc) {
+            Unit unit = Unit.fromDocument(unitDoc);
+
+            allUnits.add(unit);
+          });
+        });
+
+
+      });
+    });
+
+
+    setState(() {
+      loading = false;
+    });
+
+  }
 
   displayUserProfile(Account account) {
     return Row(
@@ -82,50 +133,65 @@ class _PropertiesState extends State<Properties> {
           displayUserProfile(account),
           const SizedBox(width: 20.0,),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size(size.width, 60.0),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: size.width*0.1),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Text("Name", style: TextStyle(color: Colors.white),),
+                Text("Tenants", style: TextStyle(color: Colors.white)),
+                Text("Due Date", style: TextStyle(color: Colors.white)),
+                Text("OutStanding Balance", style: TextStyle(color: Colors.white)),
+                Text("Status", style: TextStyle(color: Colors.white)),
+              ],
+            ),
+          ),
+        ),
       ),
-      body: FutureBuilder<QuerySnapshot>(
-        future: FirebaseFirestore.instance.collection("users").doc(account.userID!).collection("properties").orderBy("timestamp", descending: true).get(),
-        builder: (context, snapshot) {
-          if(!snapshot.hasData)
-            {
-              return Container(
-                  height: size.height,
-                  width: size.width,
-                  color: Colors.white,
-                  child: Center(child: Image.asset("assets/loading.gif"),));
-            }
-          else {
-            List<Property> properties = [];
+      body: ListView.builder(
+          shrinkWrap: true,
+          itemCount: properties.length,
+          itemBuilder: (context, index) {
+            Property property = properties[index];
 
-            snapshot.data!.docs.forEach((element) {
-              Property property = Property.fromDocument(element);
-
-              properties.add(property);
-            });
-
-            return ListView.builder(
-              itemCount: properties.length,
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                Property property = properties[index];
-
-                return Card(
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: size.width*0.1),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, "/property_details", arguments: property);
+                },
+                child: Card(
                   elevation: 2.0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0)
+                      borderRadius: BorderRadius.circular(5.0)
                   ),
-                  child: ListTile(
-                    leading: Icon(Icons.house_rounded, color: Colors.grey, size: 30.0,),
-                    title: Text(property.name!),
-                    subtitle: Text(property.city!+", "+property.country!),
+                  child: SizedBox(
+                    height: 60.0,
+                    width: size.width,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          width: size.width*0.1,
+                          child: ListTile(
+                            leading: Icon(Icons.house_rounded, color: Colors.grey, size: 30.0,),
+                            title: Text(property.name!),
+                            subtitle: Text(property.city!+", "+property.country!),
+                          ),
+                        ),
+                        Text("0"),
+                        Text("not stated"),
+                        Text("KES 0"),
+                        Text("vacant")
+                      ],
+                    ),
                   ),
-                );
-              },
+                ),
+              ),
             );
-          }
-        },
-      ),
+          }),
     );
   }
 }
