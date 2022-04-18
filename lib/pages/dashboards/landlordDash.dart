@@ -70,9 +70,8 @@ class _LandlordDashState extends State<LandlordDash> {
       await context.read<EKodi>().switchUser(Account.fromDocument(value));
     });
 
-    await FirebaseFirestore.instance.collection('users')
-        .doc(userID)
-        .collection('properties').orderBy("timestamp", descending: true).get().then((documents) {
+    await FirebaseFirestore.instance.collection('properties')
+        .where("publisherID", isEqualTo: userID).orderBy("timestamp", descending: true).get().then((documents) {
       documents.docs.forEach((document) {
         Property property = Property.fromDocument(document);
 
@@ -609,7 +608,7 @@ class _LandlordDashState extends State<LandlordDash> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Text("+254-797-383-995", style: TextStyle(color: Colors.white, fontSize: 13.0),),
+                    Text("+254701518100", style: TextStyle(color: Colors.white, fontSize: 13.0),),
                     Text("Help & Support", style: TextStyle(color: Colors.white30, fontSize: 11.0),),
                   ],
                 )
@@ -645,6 +644,7 @@ class _LandlordDashState extends State<LandlordDash> {
               width: size.width,
               color: Colors.white,
               child: Center(child: Image.asset("assets/loading.gif"),)) : Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: size.width,
@@ -703,10 +703,16 @@ class _LandlordDashState extends State<LandlordDash> {
                       ),
 
                       //TODO: Put search widget here
-                      SearchTextField(
-                        controller: searchController,
-                        hintText: "Search anything here...",
-                      )
+                      // SizedBox(
+                      //   height: 40.0,
+                      //   child: AuthTextField(
+                      //     controller: searchController,
+                      //     prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      //     hintText: "Search anything here...",
+                      //     isObscure: false,
+                      //     inputType: TextInputType.text,
+                      //   ),
+                      // )
                     ],
                   ),
                 ),

@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:rekodi/model/feature.dart';
@@ -100,7 +102,7 @@ class _HomeMobileState extends State<HomeMobile> {
                         const Text("WELCOME TO e-KODI"),
                         const SizedBox(height: 10.0,),
                         RichText(
-                          textScaleFactor: 4.0,
+                          textScaleFactor: 2.0,
                           textAlign: TextAlign.center,
                           text: TextSpan(
                             children: <TextSpan>[
@@ -368,7 +370,24 @@ class _HomeMobileState extends State<HomeMobile> {
                             Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: RaisedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  if(name.text.isNotEmpty && surname.text.isNotEmpty
+                                      && email.text.isNotEmpty && message.text.isNotEmpty)
+                                    {
+                                      String id = DateTime.now().millisecondsSinceEpoch.toString();
+
+                                      await FirebaseFirestore.instance.collection("feedback").doc(id).set(
+                                          {
+                                            "name": name.text.trim() + " " + surname.text.trim(),
+                                            "email": email.text.trim(),
+                                            "message": message,
+                                            "id": id,
+                                          }).then((value) => Fluttertoast.showToast(msg: "Feedback sent successfully!"));
+                                    }
+                                  else {
+                                    Fluttertoast.showToast(msg: "Fill the required fields!");
+                                  }
+                                },
                                 color: Colors.blue,
                                 elevation: 5.0,
                                 shape: RoundedRectangleBorder(
@@ -707,7 +726,7 @@ class _HomeTabletState extends State<HomeTablet> {
                         const SizedBox(width: 10.0,),
                         const Icon(Icons.local_phone_rounded, color: Colors.white,),
                         const SizedBox(width: 10.0,),
-                        Text("+254-797-383-995", maxLines: null, style: GoogleFonts.baloo2(color: Colors.white,  fontSize: 20.0,)),
+                        Text("+254701518100", maxLines: null, style: GoogleFonts.baloo2(color: Colors.white,  fontSize: 20.0,)),
                       ],
                     ),
                     const SizedBox(height: 10.0,),
@@ -743,7 +762,24 @@ class _HomeTabletState extends State<HomeTablet> {
                             Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: RaisedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  if(name.text.isNotEmpty && surname.text.isNotEmpty
+                                      && email.text.isNotEmpty && message.text.isNotEmpty)
+                                  {
+                                    String id = DateTime.now().millisecondsSinceEpoch.toString();
+
+                                    await FirebaseFirestore.instance.collection("feedback").doc(id).set(
+                                        {
+                                          "name": name.text.trim() + " " + surname.text.trim(),
+                                          "email": email.text.trim(),
+                                          "message": message,
+                                          "id": id,
+                                        }).then((value) => Fluttertoast.showToast(msg: "Feedback sent successfully!"));
+                                  }
+                                  else {
+                                    Fluttertoast.showToast(msg: "Fill the required fields!");
+                                  }
+                                },
                                 color: Colors.blue,
                                 elevation: 5.0,
                                 shape: RoundedRectangleBorder(
@@ -796,10 +832,6 @@ class _HomeDesktopState extends State<HomeDesktop> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       key: _scaffoldKey,
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {},
-      //   child: Image.asset("assets/wa.png"),
-      // ),
       drawer: const CustomDrawer(),
       appBar: PreferredSize(
         child: CustomAppBar(scaffoldKey: _scaffoldKey,),
@@ -876,24 +908,35 @@ class _HomeDesktopState extends State<HomeDesktop> {
 
             Container(
               width: size.width,
+              height: size.height,
               decoration: const BoxDecoration(
                   image: DecorationImage(
                       image: AssetImage("assets/images/about_bg.png"),
-                      fit: BoxFit.fitWidth
+                      fit: BoxFit.fitHeight
                   )
               ),
-              child: Padding(
-                padding: EdgeInsets.all(size.width*0.1),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset("assets/images/about-left-image.png", width: size.width*0.25, ),
-                    Expanded(
-                      child: SizedBox(
-                        height: size.height*0.7,
+              child: Stack(
+                children: [
+                  SizedBox(
+                    width: size.width,
+                    height: size.height,
+                  ),
+                  Positioned(
+                    left: 0.0,
+                    top: 0.0,
+                    bottom: 0.0,
+                    child: Image.asset("assets/images/about-left-image.png", width: size.width*0.25, ),
+                  ),
+                  Positioned(
+                    top: 0.0,
+                    bottom: 0.0,
+                    right: 0.0,
+                    child: SizedBox(
+                      width: size.width*0.8,
+                      child: Center(
                         child: GridView.count(
                           crossAxisCount: 2,
-                          childAspectRatio: size.width*0.2/200.0,
+                          childAspectRatio: size.width*0.4/200.0,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           children: List.generate(myServices.services.length, (index) {
@@ -906,7 +949,7 @@ class _HomeDesktopState extends State<HomeDesktop> {
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -920,7 +963,7 @@ class _HomeDesktopState extends State<HomeDesktop> {
                                           children: [
                                             Text(service.name!, maxLines: 1000,  style: GoogleFonts.baloo2(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.bold)),
                                             const SizedBox(height: 5.0,),
-                                            Text(service.description!, maxLines: null, style: GoogleFonts.baloo2(color: Colors.white, fontSize: 16.0,)),
+                                            Text(service.description!, overflow: TextOverflow.ellipsis, maxLines: 5, style: GoogleFonts.baloo2(color: Colors.white, fontSize: 16.0,)),
                                           ],
                                         ),
                                       )
@@ -933,8 +976,8 @@ class _HomeDesktopState extends State<HomeDesktop> {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
@@ -1122,7 +1165,7 @@ class _HomeDesktopState extends State<HomeDesktop> {
                               children: [
                                 const Icon(Icons.local_phone_rounded, color: Colors.white,),
                                 const SizedBox(width: 10.0,),
-                                Text("+254-797-383-995", maxLines: null, style: GoogleFonts.baloo2(color: Colors.white,  fontSize: 20.0,)),
+                                Text("+254701518100", maxLines: null, style: GoogleFonts.baloo2(color: Colors.white,  fontSize: 20.0,)),
                               ],
                             ),
                             const SizedBox(height: 10.0,),
@@ -1171,7 +1214,24 @@ class _HomeDesktopState extends State<HomeDesktop> {
                                     Padding(
                                       padding: const EdgeInsets.all(10.0),
                                       child: RaisedButton(
-                                        onPressed: () {},
+                                        onPressed: () async {
+                                          if(name.text.isNotEmpty && surname.text.isNotEmpty
+                                              && email.text.isNotEmpty && message.text.isNotEmpty)
+                                          {
+                                            String id = DateTime.now().millisecondsSinceEpoch.toString();
+
+                                            await FirebaseFirestore.instance.collection("feedback").doc(id).set(
+                                                {
+                                                  "name": name.text.trim() + " " + surname.text.trim(),
+                                                  "email": email.text.trim(),
+                                                  "message": message,
+                                                  "id": id,
+                                                }).then((value) => Fluttertoast.showToast(msg: "Feedback sent successfully!"));
+                                          }
+                                          else {
+                                            Fluttertoast.showToast(msg: "Fill the required fields!");
+                                          }
+                                        },
                                         color: Colors.blue,
                                         elevation: 5.0,
                                         shape: RoundedRectangleBorder(

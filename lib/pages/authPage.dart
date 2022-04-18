@@ -289,7 +289,7 @@ class _AuthPageState extends State<AuthPage> {
                                         password.clear();
                                       });
                                     },
-                                    child: Text("Create", style: GoogleFonts.baloo2(color: Colors.red)),
+                                    child: Text("Create Account", style: GoogleFonts.baloo2(color: Colors.red)),
                                   ),
                                 ],
                               ),

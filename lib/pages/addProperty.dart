@@ -68,13 +68,11 @@ class _AddPropertyState extends State<AddProperty> {
         publisherID: userID
       );
 
-      await FirebaseFirestore.instance.collection('users')
-        .doc(userID).collection('properties').doc(property.propertyID).set(property.toMap()).then((value) async {
+      await FirebaseFirestore.instance.collection('properties').doc(property.propertyID).set(property.toMap()).then((value) async {
           if(isMultiUnit)
             {
               units.forEach((unit) async {
-                await FirebaseFirestore.instance.collection('users')
-                    .doc(userID).collection('properties').doc(property.propertyID)
+                await FirebaseFirestore.instance.collection('properties').doc(property.propertyID)
                     .collection("units").doc(unit.unitID.toString()).set(unit.toMap());
               });
             }
@@ -84,10 +82,12 @@ class _AddPropertyState extends State<AddProperty> {
                 unitID: property.timestamp,
                 name: name.text.trim(),
                 description: notes.text.trim(),
+                tenantID: "",
+                isOccupied: false,
+                price: 0
               );
 
-              await FirebaseFirestore.instance.collection('users')
-                  .doc(userID).collection('properties').doc(property.propertyID)
+              await FirebaseFirestore.instance.collection('properties').doc(property.propertyID)
                   .collection("units").doc(unit.unitID.toString()).set(unit.toMap());
             }
       });
@@ -299,15 +299,18 @@ class _AddPropertyState extends State<AddProperty> {
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(width: 5.0,),
+                                            const SizedBox(width: 5.0,),
                                             TextButton.icon(
-                                              label: Text("Add", style: TextStyle(color: Colors.teal),),
+                                              label: const Text("Add", style: TextStyle(color: Colors.teal),),
                                               icon: const Icon(Icons.add, color: Colors.teal,),
                                               onPressed: () async {
                                                 units.add(Unit(
                                                     name: unitName.text,
                                                     description: unitDesc.text,
-                                                  unitID: DateTime.now().millisecondsSinceEpoch
+                                                  unitID: DateTime.now().millisecondsSinceEpoch,
+                                                  tenantID: "",
+                                                  isOccupied: false,
+                                                  price: 0,
                                                 ));
 
                                                 setState(() {
@@ -322,17 +325,26 @@ class _AddPropertyState extends State<AddProperty> {
                                           mainAxisSize: MainAxisSize.min,
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: List.generate(units.length, (index) {
-                                            return ListTile(
-                                              hoverColor: Colors.grey.shade300,
-                                              title: Text(units[index].name!),
-                                              subtitle: Text(units[index].description!),
-                                              trailing: IconButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    units.remove(units[index]);
-                                                  });
-                                                },
-                                                icon: const Icon(Icons.cancel_outlined, color: Colors.red,),
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                              child: Card(
+                                                elevation: 3.0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(5.0)
+                                                ),
+                                                child: ListTile(
+                                                  hoverColor: Colors.grey.shade300,
+                                                  title: Text(units[index].name!),
+                                                  subtitle: Text(units[index].description!),
+                                                  trailing: IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        units.remove(units[index]);
+                                                      });
+                                                    },
+                                                    icon: const Icon(Icons.cancel_outlined, color: Colors.red,),
+                                                  ),
+                                                ),
                                               ),
                                             );
                                           }),

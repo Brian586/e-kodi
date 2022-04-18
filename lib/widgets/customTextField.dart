@@ -98,8 +98,9 @@ class MyTextField extends StatefulWidget {
   final String? hintText;
   final double? width;
   final String? title;
+  final TextInputType? inputType;
 
-  const MyTextField({Key? key, this.controller, this.hintText, this.width, this.title}) : super(key: key);
+  const MyTextField({Key? key, this.controller, this.hintText, this.width, this.title, this.inputType}) : super(key: key);
 
   @override
   State<MyTextField> createState() => _MyTextFieldState();
@@ -144,22 +145,20 @@ class _MyTextFieldState extends State<MyTextField> {
                 },
                 child: TextFormField(
                   controller: widget.controller,
+                  //obscureText: isObscure!,
+                  keyboardType: widget.inputType,
                   cursorColor: Theme.of(context).primaryColor,
-                  style: const TextStyle(fontSize: 12.0, height: 1.5, color: Colors.black),
                   decoration: InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                        borderSide: const BorderSide(
-                            width: 2.0,
-                            color: Colors.grey
-                        )),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0),
+                        borderRadius: BorderRadius.circular(30.0),
                         borderSide: const BorderSide(
-                          width: 2.0,
-                        )),
-                    fillColor: Colors.white,
+                          width: 1.0,
+                        )
+                    ),
+                    //prefixIcon: prefixIcon,
+                    focusColor: Theme.of(context).primaryColor,
                     hintText: widget.hintText,
+                    labelText: widget.hintText,
                     hintStyle: const TextStyle(color: Colors.grey),
                   ),
                 ),

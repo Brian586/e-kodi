@@ -18,13 +18,13 @@ List<Service> services = [
     description: "Harmonize all your customer and property data into one location for quick generation of receipts, accessible in real time in and out of your office.",
   ),
   Service(
+    name: "Free Rent Collection",
+    icon: "assets/images/service_icon_04.png",
+    description: "Automate your rent collection process with no additional transaction cost.",
+  ),
+  Service(
     name: "Analytics",
     icon: "assets/images/service_icon_03.png",
     description: "Remove the guess work, tiresome excel sheets and risk involved in poor record keeping. Our sophisticated software analyzes all your property records including but not limited to revenue, repair cost, and rent areas to give performance insight to your financial data.",
   ),
-  Service(
-    name: "Free Rent Collection",
-    icon: "assets/images/service_icon_04.png",
-    description: "Automate your rent collection process with no additional transaction cost.",
-  )
 ];

@@ -28,8 +28,8 @@ List<TabItem> tabItems = [
     name: "Tasks",
     iconData: Icons.check_box_outlined,
   ),
-  TabItem(
-    name: "More",
-    iconData: Icons.more_horiz_rounded,
-  ),
+  // TabItem(
+  //   name: "More",
+  //   iconData: Icons.more_horiz_rounded,
+  // ),
 ];
