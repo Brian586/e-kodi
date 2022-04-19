@@ -243,17 +243,17 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                         ],
                       ),
                       const SizedBox(height: 10.0,),
-                      Icon(Icons.person_add, color: Colors.grey, size: 80.0,),
+                      Image.asset("assets/add_tenant.png", height: 80.0, width: 80.0, fit: BoxFit.contain,),
                       const SizedBox(height: 10.0,),
-                      Text("Start by adding your tenant"),
+                      const Text("Start by adding your tenant"),
                       const SizedBox(height: 10.0,),
-                      Text("Once you add a tenant, you can start tracking your rent payments"),
+                      const Text("Once you add a tenant, you can start tracking your rent payments"),
                       const SizedBox(height: 10.0,),
                       RaisedButton.icon(
                           onPressed: () {},
                           color: Colors.blue,
-                          icon: Icon(Icons.person_add, color: Colors.white,),
-                          label: Text("Add new tenant", style: TextStyle(color: Colors.white),)
+                          icon: const Icon(Icons.person_add, color: Colors.white,),
+                          label: const Text("Add new tenant", style: TextStyle(color: Colors.white),)
                       )
                     ],
                   ),
@@ -304,14 +304,14 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                           )
                         ],
                       ),
-                      Divider(color: Colors.grey,),
+                      const Divider(color: Colors.grey,),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(Icons.assignment, color: Colors.grey, size: 40.0,),
-                          SizedBox(height: 10.0,),
-                          Text("No documents added", style: TextStyle(color: Colors.grey),)
+                          Icon(Icons.assignment, color: Colors.grey.shade400, size: 40.0,),
+                          const SizedBox(height: 10.0,),
+                          const Text("No documents added", style: TextStyle(color: Colors.grey),)
                         ],
                       )
                     ],
@@ -363,14 +363,14 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                           )
                         ],
                       ),
-                      Divider(color: Colors.grey,),
+                      const Divider(color: Colors.grey,),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(Icons.currency_exchange_rounded, color: Colors.grey, size: 40.0,),
-                          SizedBox(height: 10.0,),
-                          Text("No documents added", style: TextStyle(color: Colors.grey),)
+                          Icon(Icons.currency_exchange_rounded, color: Colors.grey.shade400, size: 40.0,),
+                          const SizedBox(height: 10.0,),
+                          const Text("No documents added", style: TextStyle(color: Colors.grey),)
                         ],
                       )
                     ],

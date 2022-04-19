@@ -83,7 +83,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
                 //prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 15.0,),
                 border: InputBorder.none,
                 hintText: widget.hintText,
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 15.0)
+                hintStyle: const TextStyle(color: Colors.grey, fontSize: 15.0)
               ),
             ),
           ),

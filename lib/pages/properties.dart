@@ -176,8 +176,9 @@ class _PropertiesState extends State<Properties> {
                         SizedBox(
                           width: size.width*0.1,
                           child: ListTile(
-                            leading: Icon(Icons.house_rounded, color: Colors.grey, size: 30.0,),
-                            title: Text(property.name!),
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.house_rounded, color: Colors.grey, size: 30.0,),
+                            title: Text(property.name!, overflow: TextOverflow.ellipsis,),
                             subtitle: Text(property.city!+", "+property.country!),
                           ),
                         ),

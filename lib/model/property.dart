@@ -11,10 +11,25 @@ class Property {
   final String? notes;
   final int? timestamp;
   final String? publisherID;
+  //TODO: Add these
+  // final int? occupied;
+  // final int? vacant;
 
 
   Property(
-      {this.name, this.timestamp, this.publisherID, this.propertyID, this.country, this.city, this.town, this.address, this.units, this.notes});
+      {this.name,
+        this.timestamp,
+        this.publisherID,
+        this.propertyID,
+        this.country,
+        this.city,
+        this.town,
+        this.address,
+        this.units,
+        this.notes,
+        // this.occupied,
+        // this.vacant
+      });
 
   Map<String, dynamic> toMap() {
     return {
@@ -27,7 +42,9 @@ class Property {
       "units": units,
       "notes": notes,
       "timestamp": timestamp,
-      "publisherID": publisherID
+      "publisherID": publisherID,
+      // "occupied": occupied,
+      // "vacant": vacant,
     };
   }
 
@@ -43,6 +60,8 @@ class Property {
       notes: doc.get("notes") ?? "",
       timestamp: doc.get("timestamp") ?? "",
       publisherID: doc.get("publisherID") ?? "",
+      // vacant: doc.get("vacant") ?? "",
+      // occupied: doc.get("occupied") ?? "",
     );
   }
 }

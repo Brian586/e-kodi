@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:rekodi/config.dart';
 import 'package:rekodi/model/account.dart';
 import 'package:rekodi/pages/addProperty.dart';
+import 'package:rekodi/pages/addTenant.dart';
 import 'package:rekodi/pages/dashboards/dashboard.dart';
 import 'package:rekodi/pages/home.dart';
 import 'package:rekodi/pages/authPage.dart';
@@ -57,7 +58,8 @@ class MyApp extends StatelessWidget {
         "/dashboard": (context) => const Dashboard(),
         "/addProperty": (context)=> const AddProperty(),
         "/properties": (context) => const Properties(),
-        "/property_details": (context) => const PropertyDetails()
+        "/property_details": (context) => const PropertyDetails(),
+        "/add_tenant": (context) => const AddTenant()
       },
     );
   }
