@@ -6,11 +6,28 @@ class Unit {
   final int? unitID;
   final String? tenantID;
   final bool? isOccupied;
-  final int? price;
+  final int? rent;
+  final int? deposit;
   final int? dueDate;
+  final int? startDate;
   final String? propertyID;
+  final String? paymentFreq;
+  final int? reminder;
 
-  Unit({this.name,this.tenantID, this.price, this.propertyID, this.dueDate, this.isOccupied, this.unitID, this.description});
+  Unit({
+    this.name,
+    this.tenantID,
+    this.rent,
+    this.propertyID,
+    this.dueDate,
+    this.isOccupied,
+    this.unitID,
+    this.description,
+    this.startDate,
+    this.deposit,
+    this.paymentFreq,
+    this.reminder,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -19,9 +36,13 @@ class Unit {
       "unitID": unitID,
       "tenantID": tenantID,
       "isOccupied": isOccupied,
-      "price": price,
+      "rent": rent,
       "dueDate": dueDate,
       "propertyID": propertyID,
+      "startDate": startDate,
+      "deposit": deposit,
+      "paymentFreq": paymentFreq,
+      "reminder": reminder
     };
   }
 
@@ -32,9 +53,13 @@ class Unit {
       unitID: doc.get("unitID") ?? "",
       tenantID: doc.get("tenantID") ?? "",
       isOccupied: doc.get("isOccupied") ?? "",
-      price: doc.get("price") ?? "",
+      rent: doc.get("rent") ?? "",
       dueDate: doc.get("dueDate") ?? "",
-      propertyID: doc.get("propertyID") ?? ""
+      propertyID: doc.get("propertyID") ?? "",
+      deposit: doc.get("deposit") ?? "",
+      startDate: doc.get("startDate") ?? "",
+      paymentFreq: doc.get("paymentFreq") ?? "",
+      reminder: doc.get("reminder") ?? "",
     );
   }
 }

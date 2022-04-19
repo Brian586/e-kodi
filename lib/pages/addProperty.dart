@@ -65,7 +65,9 @@ class _AddPropertyState extends State<AddProperty> {
         notes: notes.text.trim(),
         timestamp: DateTime.now().millisecondsSinceEpoch,
         units: isMultiUnit ? units.length : 1,
-        publisherID: userID
+        publisherID: userID,
+        vacant: isMultiUnit ? units.length : 1,
+        occupied: 0
       );
 
       await FirebaseFirestore.instance.collection('properties').doc(property.propertyID).set(property.toMap()).then((value) async {
@@ -84,9 +86,13 @@ class _AddPropertyState extends State<AddProperty> {
                 description: notes.text.trim(),
                 tenantID: "",
                 isOccupied: false,
-                price: 0,
+                rent: 0,
                 dueDate: 0,
                 propertyID: property.propertyID,
+                deposit: 0,
+                startDate: 0,
+                paymentFreq: "",
+                reminder: 0,
               );
 
               await FirebaseFirestore.instance.collection('properties').doc(property.propertyID)
@@ -312,9 +318,13 @@ class _AddPropertyState extends State<AddProperty> {
                                                   unitID: DateTime.now().millisecondsSinceEpoch,
                                                   tenantID: "",
                                                   isOccupied: false,
-                                                  price: 0,
+                                                  rent: 0,
                                                   dueDate: 0,
-                                                  propertyID: propertyID
+                                                  propertyID: propertyID,
+                                                  deposit: 0,
+                                                  startDate: 0,
+                                                  paymentFreq: "",
+                                                  reminder: 0,
                                                 ));
 
                                                 setState(() {

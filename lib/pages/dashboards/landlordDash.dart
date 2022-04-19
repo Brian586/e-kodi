@@ -39,12 +39,14 @@ class _LandlordDashState extends State<LandlordDash> {
   String selected = 'Dashboard';
   TextEditingController searchController = TextEditingController();
   List<Property> properties = [];
+  int vacantUnits = 0;
+  int occupiedUnits = 0;
   bool loading = false;
   List<_ChartData>? chartData;
   TooltipBehavior? _tooltipBehavior;
   final double _columnWidth = 0.8;
   final double _columnSpacing = 0.2;
-  List<Unit> allUnits = [];
+  //List<Unit> allUnits = [];
 
 
   @override
@@ -68,6 +70,9 @@ class _LandlordDashState extends State<LandlordDash> {
       loading = true;
     });
 
+    vacantUnits = 0;
+    occupiedUnits = 0;
+
     String userID = Provider.of<EKodi>(context, listen: false).account.userID!;
 
     await FirebaseFirestore.instance.collection("users").doc(userID).get().then((value) async {
@@ -82,13 +87,17 @@ class _LandlordDashState extends State<LandlordDash> {
 
         properties.add(property);
 
-        await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
-          value.docs.forEach((unitDoc) {
-            Unit unit = Unit.fromDocument(unitDoc);
+        vacantUnits = vacantUnits+property.vacant!.toInt();
 
-            allUnits.add(unit);
-          });
-        });
+        occupiedUnits = occupiedUnits+property.occupied!.toInt();
+
+        // await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
+        //   value.docs.forEach((unitDoc) {
+        //     Unit unit = Unit.fromDocument(unitDoc);
+        //
+        //     allUnits.add(unit);
+        //   });
+        // });
 
 
       });
@@ -105,6 +114,9 @@ class _LandlordDashState extends State<LandlordDash> {
     //wait for user to add property
     await Navigator.pushNamed(context, "/addProperty");
 
+    vacantUnits = 0;
+    occupiedUnits = 0;
+
     String userID = Provider.of<EKodi>(context, listen: false).account.userID!;
 
     // load property from database
@@ -116,13 +128,17 @@ class _LandlordDashState extends State<LandlordDash> {
 
         properties.add(property);
 
-        await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
-          value.docs.forEach((unitDoc) {
-            Unit unit = Unit.fromDocument(unitDoc);
+        vacantUnits = vacantUnits+property.vacant!.toInt();
 
-            allUnits.add(unit);
-          });
-        });
+        occupiedUnits = occupiedUnits+property.occupied!.toInt();
+
+        // await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
+        //   value.docs.forEach((unitDoc) {
+        //     Unit unit = Unit.fromDocument(unitDoc);
+        //
+        //     allUnits.add(unit);
+        //   });
+        // });
 
 
       });
@@ -197,6 +213,7 @@ class _LandlordDashState extends State<LandlordDash> {
           maximum: 50,
           minimum: 0,
           interval: 5,
+          labelFormat: '{value}k',
           axisLine: const AxisLine(width: 0),
           majorTickLines: const MajorTickLines(size: 0)),
       series: _getDefaultColumn(),
@@ -728,8 +745,6 @@ class _LandlordDashState extends State<LandlordDash> {
     return ResponsiveBuilder(
       builder: (context, sizeInfo) {
         bool isDesktop = sizeInfo.isDesktop;
-        int vacant = allUnits.where((unit) => unit.isOccupied == false).toList().length;
-        int occupied = allUnits.where((unit) => unit.isOccupied == true).toList().length;
 
         return Scaffold(
           backgroundColor: Colors.grey.shade50,
@@ -955,7 +970,7 @@ class _LandlordDashState extends State<LandlordDash> {
                                                 mainAxisSize: MainAxisSize.min,
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
-                                                  Text(vacant.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+                                                  Text(vacantUnits.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
                                                   const SizedBox(height: 5.0,),
                                                   const Text("Vacant", style: TextStyle(fontSize: 15.0,  color: Colors.grey, fontWeight: FontWeight.bold),),
                                                 ],
@@ -965,7 +980,7 @@ class _LandlordDashState extends State<LandlordDash> {
                                                 mainAxisSize: MainAxisSize.min,
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
-                                                  Text(occupied.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+                                                  Text(occupiedUnits.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
                                                   const SizedBox(height: 5.0,),
                                                   const Text("Occupied", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
                                                 ],

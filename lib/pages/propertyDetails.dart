@@ -7,14 +7,26 @@ import '../config.dart';
 import '../model/account.dart';
 
 class PropertyDetails extends StatefulWidget {
+  final Object? property;
 
-  const PropertyDetails({Key? key,}) : super(key: key);
+  const PropertyDetails(this.property,{Key? key, }) : super(key: key);
 
   @override
   State<PropertyDetails> createState() => _PropertyDetailsState();
 }
 
 class _PropertyDetailsState extends State<PropertyDetails> {
+  late Property property;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      property = widget.property as Property;
+    });
+  }
 
   displayUserProfile(Account account) {
     return Row(
@@ -43,8 +55,6 @@ class _PropertyDetailsState extends State<PropertyDetails> {
   Widget build(BuildContext context) {
     Account account = context.watch<EKodi>().account;
     Size size = MediaQuery.of(context).size;
-    Property property = ModalRoute.of(context)!.settings.arguments as Property;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,

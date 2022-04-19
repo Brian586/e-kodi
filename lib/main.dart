@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rekodi/config.dart';
 import 'package:rekodi/model/account.dart';
+import 'package:rekodi/model/property.dart';
 import 'package:rekodi/pages/addProperty.dart';
 import 'package:rekodi/pages/addTenant.dart';
 import 'package:rekodi/pages/dashboards/dashboard.dart';
@@ -51,16 +52,30 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
       ),
       initialRoute: '/',
-      routes: {
-        "/": (context) => const SplashScreen(),
-        '/home': (context) => const HomePage(),
-        "/auth": (context) => const AuthPage(),
-        "/dashboard": (context) => const Dashboard(),
-        "/addProperty": (context)=> const AddProperty(),
-        "/properties": (context) => const Properties(),
-        "/property_details": (context) => const PropertyDetails(),
-        "/add_tenant": (context) => const AddTenant()
+      onGenerateRoute: (RouteSettings settings) {
+        var routes = <String, WidgetBuilder>{
+          "/": (context) => const SplashScreen(),
+          '/home': (context) => const HomePage(),
+          "/auth": (context) => const AuthPage(),
+          "/dashboard": (context) => const Dashboard(),
+          "/addProperty": (context)=> const AddProperty(),
+          "/properties": (context) => const Properties(),
+          "/property_details": (context) => PropertyDetails(settings.arguments),
+          "/add_tenant": (context) => AddTenant(settings.arguments)
+        };
+        WidgetBuilder builder = routes[settings.name]!;
+        return MaterialPageRoute(builder: (ctx) => builder(ctx));
       },
+      // routes: {
+      //   "/": (context) => const SplashScreen(),
+      //   '/home': (context) => const HomePage(),
+      //   "/auth": (context) => const AuthPage(),
+      //   "/dashboard": (context) => const Dashboard(),
+      //   "/addProperty": (context)=> const AddProperty(),
+      //   "/properties": (context) => const Properties(),
+      //   "/property_details": (context) => const PropertyDetails(),
+      //   "/add_tenant": (context) => const AddTenant()
+      // },
     );
   }
 }
