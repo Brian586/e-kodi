@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,9 +7,12 @@ import 'package:provider/provider.dart';
 import 'package:rekodi/widgets/customTextField.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../config.dart';
 import '../../model/account.dart';
+import '../../model/property.dart';
+import '../../model/unit.dart';
 import '../../providers/datePeriod.dart';
 
 
@@ -31,6 +35,7 @@ class _TenantDashState extends State<TenantDash> {
 
   TextEditingController searchController = TextEditingController();
   List<_ChartData>? chartData;
+  Future<QuerySnapshot>? unitSnapshot;
 
   @override
   void initState() {
@@ -43,7 +48,21 @@ class _TenantDashState extends State<TenantDash> {
       _ChartData("March", 29, 24),
       _ChartData("April", 17, 27)
     ];
+
+    getUnitInfo();
     super.initState();
+  }
+
+  getUnitInfo() async {
+
+    String userID = Provider.of<EKodi>(context, listen: false).account.userID!;
+
+    Future<QuerySnapshot> documentSnapshot = FirebaseFirestore.instance.collection("users").doc(userID).collection("units").limit(1).get();
+
+    setState(() {
+      unitSnapshot = documentSnapshot;
+    });
+
   }
 
   displayUserProfile(Account account) {
@@ -232,6 +251,79 @@ class _TenantDashState extends State<TenantDash> {
     super.dispose();
   }
 
+  /// Returns gradient progress style circular progress bar.
+  Widget _buildSliderWithCircle(Size size, int startDate, int dueDate) {
+    int period = dueDate - startDate;
+    int remainingPeriod = dueDate - DateTime.now().millisecondsSinceEpoch;
+    double maxDays = period/8.64e+7;
+
+    double remainingDays = remainingPeriod/8.64e+7;
+
+    return SizedBox(
+        height: size.width*0.1,
+        width: size.width*0.1,
+        child: SfRadialGauge(axes: <RadialAxis>[
+          RadialAxis(
+              showLabels: false,
+              showTicks: false,
+              startAngle: 270,
+              maximum: maxDays,//TODO: Implement for calculating month days
+              endAngle: 270,
+              radiusFactor: 0.8,
+              axisLineStyle: const AxisLineStyle(
+                thickness: 0.1,
+                thicknessUnit: GaugeSizeUnit.factor,
+              ),
+              ranges: <GaugeRange>[
+                GaugeRange(
+                    endValue: remainingDays,
+                    startValue: 0.0,
+                    sizeUnit: GaugeSizeUnit.factor,
+                    color: const Color.fromRGBO(197, 91, 226, 1),
+                    gradient: const SweepGradient(colors: <Color>[
+                      Color.fromRGBO(197, 91, 226, 1),
+                      Color.fromRGBO(115, 67, 189, 1)
+                    ], stops: <double>[
+                      0.5,
+                      1
+                    ]),
+                    endWidth: 0.1,
+                    startWidth: 0.1)
+              ],
+              pointers: <GaugePointer>[
+                const MarkerPointer(
+                  value: 0.0,
+                  overlayRadius: 0,
+                  elevation: 5,
+                  markerType: MarkerType.circle,
+                  markerHeight: 22,
+                  markerWidth: 22,
+                  enableDragging: false,
+                  // onValueChanged: handleFirstPointerValueChanged,
+                  // onValueChanging: handleFirstPointerValueChanging,
+                  color: Color.fromRGBO(125, 71, 194, 1),
+                ),
+                MarkerPointer(
+                  value: remainingDays,
+                  elevation: 5,
+                  overlayRadius: 0,
+                  markerType: MarkerType.circle,
+                  markerHeight: 22,
+                  markerWidth: 22,
+                  enableDragging: false,
+                  // onValueChanged: handleSecondPointerValueChanged,
+                  // onValueChanging: handleSecondPointerValueChanging,
+                  color: const Color.fromRGBO(125, 71, 194, 1),
+                )
+              ],
+              annotations: <GaugeAnnotation>[
+                GaugeAnnotation(
+                    positionFactor: 0.1,
+                    widget: Text('${remainingDays.round()} Days \n Left'))
+              ]),
+        ]));
+  }
+
   @override
   Widget build(BuildContext context) {
     Account account = context.watch<EKodi>().account;
@@ -330,7 +422,7 @@ class _TenantDashState extends State<TenantDash> {
                               ],
                             ),
                           ),
-                          subtitle: Text("Welcome to e-KODI! Here's your activity today."),
+                          subtitle: const Text("Welcome to e-KODI! Here's your activity today."),
                         ),
                       )
                     ],
@@ -352,10 +444,126 @@ class _TenantDashState extends State<TenantDash> {
                             Expanded(
                               flex: 1,
                               child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ListTile(
                                     title: const Text("Billing", style: TextStyle(fontWeight: FontWeight.bold,),),
                                     subtitle: displayPeriod(startDate, endDate),
+                                  ),
+                                  const Text("My Property", style: TextStyle(fontWeight: FontWeight.bold,),),
+                                  Expanded(
+                                    child: FutureBuilder<QuerySnapshot>(
+                                      future: unitSnapshot,
+                                      builder: (context, snapshot) {
+                                        if(!snapshot.hasData)
+                                          {
+                                            return Text("Loading...");
+                                          }
+                                        else
+                                          {
+                                            List<Unit> units = [];
+
+                                            snapshot.data!.docs.forEach((element) {
+                                              Unit unit = Unit.fromDocument(element);
+
+                                              units.add(unit);
+                                            });
+
+                                            if(units.isEmpty)
+                                              {
+                                                return Center(
+                                                  child: Column(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: const [
+                                                      Icon(Icons.house_rounded, color: Colors.grey, size: 70.0,),
+                                                      SizedBox(height: 10.0,),
+                                                      Text("You currently don't have a unit", style: TextStyle(color: Colors.grey),)
+                                                    ],
+                                                  ),
+                                                );
+                                              }
+                                            else
+                                              {
+                                                return Card(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(10.0),
+                                                  ),
+                                                  elevation: 5.0,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(10.0),
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Expanded(
+                                                          child: FutureBuilder<DocumentSnapshot>(
+                                                            future: FirebaseFirestore.instance.collection("properties").doc(units[0].propertyID).get(),
+                                                            builder: (context, snap) {
+                                                              if(!snap.hasData)
+                                                              {
+                                                                return const Text("Property Info Loading");
+                                                              }
+                                                              else {
+
+                                                                Property property = Property.fromDocument(snap.data!);
+
+                                                                return Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  mainAxisSize: MainAxisSize.min,
+                                                                  children: [
+                                                                    Text(property.name!, style: TextStyle(fontWeight: FontWeight.bold,)),
+                                                                    const SizedBox(height: 5.0,),
+                                                                    Text("${property.address}, ${property.city} ${property.country}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),),
+                                                                    const SizedBox(height: 5.0,),
+                                                                    Text(property.notes!, maxLines: 2, overflow: TextOverflow.ellipsis,),
+                                                                    Divider(color: Colors.grey.shade300,)
+                                                                  ],
+                                                                );
+                                                              }
+                                                            },
+                                                          ),
+                                                        ),
+
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.end,
+                                                          children: [
+                                                            RaisedButton.icon(
+                                                              color: Colors.blue,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(5.0),
+                                                              ),
+                                                              icon: const Icon(Icons.paypal, color: Colors.white,),
+                                                              label: const Text("Pay Rent", style: TextStyle(color: Colors.white),),
+                                                              onPressed: () {},
+                                                            ),
+                                                            SizedBox(width: 5.0,),
+                                                            InkWell(
+                                                              onTap: () {},
+                                                              child: Container(
+                                                                height: 25.0,
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(5.0),
+                                                                    border: Border.all(
+                                                                        color: Colors.red,
+                                                                        width: 1.0
+                                                                    )
+                                                                ),
+                                                                child: const Padding(
+                                                                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                                                                  child: Center(child: Text("Request to Leave Property", style: TextStyle(color: Colors.red),)),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                          }
+                                      },
+                                    ),
                                   )
                                 ],
                               ),
@@ -414,6 +622,45 @@ class _TenantDashState extends State<TenantDash> {
                                   ],
                                   border: Border.all(width: 0.5, color: Colors.grey.shade300)
                               ),
+                              child: FutureBuilder<QuerySnapshot>(
+                                future: unitSnapshot,
+                                builder: (context, snap) {
+                                  if(!snap.hasData)
+                                    {
+                                      return Text("Loading...");
+                                    }
+                                  else
+                                    {
+                                      List<Unit> units = [];
+
+                                      snap.data!.docs.forEach((element) {
+                                        Unit unit = Unit.fromDocument(element);
+
+                                        units.add(unit);
+                                      });
+
+                                      if(units.isEmpty)
+                                      {
+                                        return Center(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: const [
+                                              //Icon(Icons.noth, color: Colors.grey, size: 70.0,),
+                                              SizedBox(height: 10.0,),
+                                              Text("You currently don't have a unit", style: TextStyle(color: Colors.grey),)
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                      else
+                                        {
+                                          return Center(
+                                            child: _buildSliderWithCircle(size, units[0].startDate!, units[0].dueDate!),
+                                          );
+                                        }
+                                    }
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -459,7 +706,7 @@ class _TenantDashState extends State<TenantDash> {
                       child: Column(
                         children: [
                           Icon(Icons.engineering_rounded, color: Colors.grey.shade300, size: 60.0,),
-                          SizedBox(height: 10.0,),
+                          const SizedBox(height: 10.0,),
                           Text("No service providers available", style: TextStyle(color: Colors.grey.shade300,),)
                         ],
                       ),

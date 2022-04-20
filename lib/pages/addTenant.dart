@@ -88,7 +88,7 @@ class _AddTenantState extends State<AddTenant> {
     });
     //fetch for tenant data
 
-    await FirebaseFirestore.instance.collection("users").where("email", isEqualTo: tenantEmail)
+    await FirebaseFirestore.instance.collection("users").where("email", isEqualTo: tenantEmail.text.trim())
         .get().then((querySnapshot) {
       querySnapshot.docs.forEach((element) async {
         setState(() {
@@ -107,7 +107,7 @@ class _AddTenantState extends State<AddTenant> {
       dueDate: dueDate,
       isOccupied: true,
       unitID: selectedUnit.unitID,
-      description: notes.text,
+      description: selectedUnit.description,
       startDate: startDate,
       deposit: int.parse(deposit.text.trim()),
       paymentFreq: paymentFreq,
@@ -120,12 +120,26 @@ class _AddTenantState extends State<AddTenant> {
           Fluttertoast.showToast(msg: "Added Tenant Successfully!");
     });
 
+    await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).update(
+        {
+          "occupied": property.occupied! + 1,
+          "vacant": property.vacant! - 1,
+        });
+
     //save unit info to tenant
     await FirebaseFirestore.instance.collection("users").doc(tenantAccount.userID)
         .collection("units").doc(unit.unitID.toString()).set(unit.toMap());
 
+    Navigator.pop(context);
+
     setState(() {
       loading = false;
+      rent.clear();
+      deposit.clear();
+      notes.clear();
+      reminder.clear();
+      tenantEmail.clear();
+      allUnits.clear();
     });
   }
 

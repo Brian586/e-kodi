@@ -28,6 +28,15 @@ class _PropertyDetailsState extends State<PropertyDetails> {
     });
   }
 
+  proceedToAddTenant() async {
+
+    //TODO: Remember to check if all units are occupied before adding tenant
+
+    await Navigator.pushNamed(context, "/add_tenant", arguments: property);
+
+    //get tenant details
+  }
+
   displayUserProfile(Account account) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -127,7 +136,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                               Text("Property Details", style: Theme.of(context).textTheme.titleMedium,),
                               const Divider(color: Colors.grey,),
                               Text(property.name!, style: Theme.of(context).textTheme.bodyMedium,),
-                              Text(property.city!+", "+property.country!, style: Theme.of(context).textTheme.bodyMedium,),
+                              Text("${property.address!}, ${property.city!} ${property.country!}", style: Theme.of(context).textTheme.bodyMedium,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -232,9 +241,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                         children: [
                           Text("Leases/Tenancies", style: Theme.of(context).textTheme.titleMedium!.apply(fontWeightDelta: 2),),
                           InkWell(
-                            onTap: () {
-                              Navigator.pushNamed(context, "/add_tenant", arguments: property);
-                            },
+                            onTap: proceedToAddTenant,
                             child: Container(
                               height: 25.0,
                               decoration: BoxDecoration(
@@ -260,7 +267,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                       const Text("Once you add a tenant, you can start tracking your rent payments"),
                       const SizedBox(height: 10.0,),
                       RaisedButton.icon(
-                          onPressed: () {},
+                          onPressed: proceedToAddTenant,
                           color: Colors.blue,
                           icon: const Icon(Icons.person_add, color: Colors.white,),
                           label: const Text("Add new tenant", style: TextStyle(color: Colors.white),)
