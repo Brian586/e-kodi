@@ -321,6 +321,7 @@ class _AddTenantState extends State<AddTenant> {
                       itemBuilder: (context, index) {
                         Unit unit = allUnits[index];
                         bool isSelected = unit == selectedUnit;
+                        bool isOccupied = unit.isOccupied!;
 
                         return Card(
                           elevation: 5.0,
@@ -329,14 +330,16 @@ class _AddTenantState extends State<AddTenant> {
                           ),
                           child: ListTile(
                             onTap: () {
-                              setState(() {
-                                selectedUnit = unit;
-                              });
+                              if(!isOccupied) {
+                                setState(() {
+                                  selectedUnit = unit;
+                                });
+                              }
                             },
-                            leading: isSelected
+                            leading: isOccupied ? const Icon(Icons.check_box, color: Colors.grey,) : isSelected
                                 ? const Icon(Icons.check_box, color: Colors.teal,)
                                 : const Icon(Icons.check_box_outline_blank_rounded, color: Colors.grey,),
-                            title: Text(unit.name!),
+                            title: isOccupied ? Text(unit.name!, style: const TextStyle(decoration: TextDecoration.lineThrough)) : Text(unit.name!),
                             subtitle: Text(unit.isOccupied! ? "Occupied" : "Vacant"),
                           ),
                         );

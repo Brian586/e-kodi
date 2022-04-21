@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:rekodi/model/serviceProvider.dart';
 import 'package:rekodi/widgets/customTextField.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -380,7 +381,7 @@ class _TenantDashState extends State<TenantDash> {
       body: Row(
         children: [
           Expanded(
-            flex: 8,
+            flex: 7,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: size.width*0.05),
               child: Column(
@@ -509,14 +510,96 @@ class _TenantDashState extends State<TenantDash> {
 
                                                                 return Column(
                                                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                                   mainAxisSize: MainAxisSize.min,
                                                                   children: [
-                                                                    Text(property.name!, style: TextStyle(fontWeight: FontWeight.bold,)),
-                                                                    const SizedBox(height: 5.0,),
+                                                                    Text(property.name!, style: const TextStyle(fontWeight: FontWeight.bold,)),
+                                                                    //const SizedBox(height: 5.0,),
                                                                     Text("${property.address}, ${property.city} ${property.country}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),),
-                                                                    const SizedBox(height: 5.0,),
+                                                                    //const SizedBox(height: 5.0,),
                                                                     Text(property.notes!, maxLines: 2, overflow: TextOverflow.ellipsis,),
-                                                                    Divider(color: Colors.grey.shade300,)
+                                                                    Divider(color: Colors.grey.shade300,),
+                                                                    Expanded(
+                                                                      child: Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Expanded(
+                                                                            child: Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                                              mainAxisSize: MainAxisSize.min,
+                                                                              children: [
+                                                                                //Text("Unit Information"),
+                                                                                Text(units[0].name!, style: const TextStyle(fontWeight: FontWeight.bold,)),
+                                                                                Text(units[0].description!, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                                                                Text("Started on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].startDate!)), style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                          Column(
+                                                                            children: [
+                                                                              Expanded(
+                                                                                flex: 1,
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.all(2.0),
+                                                                                  child: Container(
+                                                                                    width: size.width*0.15,
+                                                                                    decoration: BoxDecoration(
+                                                                                      borderRadius: BorderRadius.circular(5.0),
+                                                                                      border: Border.all(
+                                                                                        width: 1.0,
+                                                                                        color: Colors.grey.shade300,
+                                                                                      )
+                                                                                    ),
+                                                                                    child: Center(
+                                                                                      child: Column(
+                                                                                        mainAxisSize: MainAxisSize.min,
+                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                        children: [
+                                                                                          const Text("Rent Amount", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0),),
+                                                                                          Text("KES " + NumberFormat("###,###.0#", "en_US").format(units[0].rent), style: const TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold),),
+                                                                                          const SizedBox(height: 5.0,),
+                                                                                          Text("Due on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].dueDate!)), style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
+                                                                                        ],
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              Expanded(
+                                                                                flex: 1,
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.all(2.0),
+                                                                                  child: Container(
+                                                                                    width: size.width*0.15,
+                                                                                    decoration: BoxDecoration(
+                                                                                        borderRadius: BorderRadius.circular(5.0),
+                                                                                        border: Border.all(
+                                                                                          width: 1.0,
+                                                                                          color: Colors.grey.shade300,
+                                                                                        )
+                                                                                    ),
+                                                                                    child: Center(
+                                                                                      child: Column(
+                                                                                        mainAxisSize: MainAxisSize.min,
+                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                        children: [
+                                                                                          const Text("Deposit Amount", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0),),
+                                                                                          Text("KES " + NumberFormat("###,###.0#", "en_US").format(units[0].deposit), style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),),
+                                                                                          // const SizedBox(height: 5.0,),
+                                                                                          // Text("Due on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].dueDate!)), style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
+                                                                                        ],
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(height: 10.0,)
+                                                                            ],
+                                                                          )
+                                                                        ],
+                                                                      ),
+                                                                    )
                                                                   ],
                                                                 );
                                                               }
@@ -532,7 +615,7 @@ class _TenantDashState extends State<TenantDash> {
                                                               shape: RoundedRectangleBorder(
                                                                 borderRadius: BorderRadius.circular(5.0),
                                                               ),
-                                                              icon: const Icon(Icons.paypal, color: Colors.white,),
+                                                              icon: const Icon(Icons.currency_exchange_rounded, color: Colors.white,),
                                                               label: const Text("Pay Rent", style: TextStyle(color: Colors.white),),
                                                               onPressed: () {},
                                                             ),
@@ -654,8 +737,19 @@ class _TenantDashState extends State<TenantDash> {
                                       }
                                       else
                                         {
-                                          return Center(
-                                            child: _buildSliderWithCircle(size, units[0].startDate!, units[0].dueDate!),
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              _buildSliderWithCircle(size, units[0].startDate!, units[0].dueDate!),
+                                              Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text("Remind me "),
+                                                  Text(units[0].reminder!.toString() + " days", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                  Text("before due date"),
+                                                ],
+                                              )
+                                            ],
                                           );
                                         }
                                     }
@@ -672,7 +766,7 @@ class _TenantDashState extends State<TenantDash> {
             ),
           ),
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Container(
               width: size.width,
               decoration: BoxDecoration(
@@ -697,19 +791,85 @@ class _TenantDashState extends State<TenantDash> {
                       // ),
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Text("Service Providers", style: TextStyle(fontWeight: FontWeight.bold),),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Service Providers", style: TextStyle(fontWeight: FontWeight.bold),),
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.filter_list_rounded, color: Colors.grey,),
+                          offset: const Offset(0.0, 0.0),
+                          onSelected: (v) {
+
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return ["Plumber", "Electrician", "Beauty & Cosmetics", "Internet Service Provider(WiFi)", "Cleaners", "Wood & Metal Works", "Tutor", "Security", "Other"].map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(choice),
+                              );
+                            }).toList();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   Expanded(
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Icon(Icons.engineering_rounded, color: Colors.grey.shade300, size: 60.0,),
-                          const SizedBox(height: 10.0,),
-                          Text("No service providers available", style: TextStyle(color: Colors.grey.shade300,),)
-                        ],
-                      ),
+                    child: FutureBuilder<QuerySnapshot>(
+                      future: FirebaseFirestore.instance.collection("serviceProviders").orderBy("timestamp", descending: true).get(),
+                      builder: (context, snapshot) {
+                        if(!snapshot.hasData) {
+                          return Text("Loading...");
+                        }
+                        else 
+                          {
+                            List<ServiceProvider> providers = [];
+                            
+                            snapshot.data!.docs.forEach((element) {
+                              providers.add(ServiceProvider.fromDocument(element));
+                            });
+                            
+                            if(providers.isEmpty)
+                              {
+                                return Center(
+                                  child: Column(
+                                    children: [
+                                      Icon(Icons.engineering_rounded, color: Colors.grey.shade300, size: 60.0,),
+                                      const SizedBox(height: 10.0,),
+                                      Text("No service providers available", style: TextStyle(color: Colors.grey.shade300,),)
+                                    ],
+                                  ),
+                                );
+                              }
+                            else {
+                              return ListView.builder(
+                                itemCount: providers.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+
+                                  ServiceProvider provider = providers[index];
+
+                                  return Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Card(
+                                      child: ListTile(
+                                        leading: ClipRRect(
+                                          borderRadius: BorderRadius.circular(15.0),
+                                          child: provider.photoUrl!  == ""
+                                              ? Image.asset("assets/profile.png", height: 30.0, width: 30.0, fit: BoxFit.cover,)
+                                              : Image.network(provider.photoUrl!, height: 30.0, width: 30.0,fit: BoxFit.cover),
+                                        ),
+                                        title: Text(provider.title!, style: const TextStyle(fontWeight: FontWeight.bold),),
+                                        subtitle: Text(provider.description!, maxLines: 3, overflow: TextOverflow.ellipsis,),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          }
+                      },
                     ),
                   )
                 ],
