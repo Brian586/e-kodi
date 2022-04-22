@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:rekodi/model/serviceProvider.dart';
 import 'package:rekodi/widgets/customTextField.dart';
+import 'package:rekodi/widgets/loadingAnimation.dart';
 
 import '../../config.dart';
 import '../../model/account.dart';
@@ -124,7 +125,7 @@ class _ServiceDashState extends State<ServiceDash> {
                             {
                               setState(() {
                                 isOther = true;
-                                _title.clear();
+                                _category.clear();
                               });
 
                               print(isOther);
@@ -132,7 +133,7 @@ class _ServiceDashState extends State<ServiceDash> {
                           else
                             {
                               setState(() {
-                                _title.text = v!;
+                                _category.text = v!;
                                 isOther = false;
                               });
                               print(isOther);
@@ -326,18 +327,20 @@ class _ServiceDashState extends State<ServiceDash> {
           const SizedBox(width: 20.0,),
         ],
       ),
-      body: loading ? Container(
-          height: size.height,
-          width: size.width,
-          color: Colors.white,
-          child: Center(child: Image.asset("assets/loading.gif"),)) : Row(
+      body: loading ? const LoadingAnimation(): Row(
         children: [
           Expanded(
-            flex: 6,
+            flex: 35,
             child: Container(),
           ),
+          VerticalDivider(color: Colors.grey.shade300,),
           Expanded(
-            flex: 4,
+            flex: 35,
+            child: Container(),
+          ),
+          VerticalDivider(color: Colors.grey.shade300,),
+          Expanded(
+            flex: 3,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,

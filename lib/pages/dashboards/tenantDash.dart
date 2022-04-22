@@ -324,6 +324,112 @@ class _TenantDashState extends State<TenantDash> {
         ]));
   }
 
+  Widget _buildNoDataCircle(Size size) {
+
+    return SizedBox(
+        height: size.width*0.1,
+        width: size.width*0.1,
+        child: SfRadialGauge(axes: <RadialAxis>[
+          RadialAxis(
+              showLabels: false,
+              showTicks: false,
+              startAngle: 270,
+              maximum: 100,
+              endAngle: 270,
+              radiusFactor: 0.8,
+              axisLineStyle: const AxisLineStyle(
+                thickness: 0.1,
+                thicknessUnit: GaugeSizeUnit.factor,
+              ),
+              ranges: <GaugeRange>[
+                GaugeRange(
+                    endValue: 75,
+                    startValue: 0.0,
+                    sizeUnit: GaugeSizeUnit.factor,
+                    color: Colors.grey.shade200,
+                    gradient: SweepGradient(
+                      colors: <Color>[
+                        Colors.grey.shade400,
+                        Colors.grey.shade200,
+                      ],
+                    ),
+                    endWidth: 0.1,
+                    startWidth: 0.1)
+              ],
+              pointers: const <GaugePointer>[
+                MarkerPointer(
+                  value: 0.0,
+                  overlayRadius: 0,
+                  elevation: 5,
+                  markerType: MarkerType.circle,
+                  markerHeight: 22,
+                  markerWidth: 22,
+                  enableDragging: false,
+                  // onValueChanged: handleFirstPointerValueChanged,
+                  // onValueChanging: handleFirstPointerValueChanging,
+                  color: Colors.grey,
+                ),
+                MarkerPointer(
+                  value: 75,
+                  elevation: 5,
+                  overlayRadius: 0,
+                  markerType: MarkerType.circle,
+                  markerHeight: 22,
+                  markerWidth: 22,
+                  enableDragging: false,
+                  // onValueChanged: handleSecondPointerValueChanged,
+                  // onValueChanging: handleSecondPointerValueChanging,
+                  color: Colors.grey,
+                )
+              ],
+              annotations: const <GaugeAnnotation>[
+                GaugeAnnotation(
+                    positionFactor: 0.1,
+                    widget: Text('No Data'))
+              ]),
+        ]));
+  }
+
+  Widget dateSelector({int? startDate, int? endDate}) {
+
+    String start = DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(startDate!));
+
+    String end = DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(endDate!));
+
+    return InkWell(
+      onTap: () => displayCalendar(startDate, endDate),
+      child: Container(
+        height: 30.0,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(3.0),
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 1,
+                  spreadRadius: 1.0,
+                  offset: Offset(0.0, 0.0)
+              )
+            ],
+            border: Border.all(width: 0.5, color: Colors.grey.shade300)
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.date_range_rounded, color: Colors.grey,size: 15.0,),
+              const SizedBox(width: 5.0,),
+              Text("$start - $end", style: const TextStyle(color: Colors.grey, fontSize: 13.0, fontWeight: FontWeight.bold),),
+              const SizedBox(width: 5.0,),
+              const Icon(Icons.arrow_drop_down, color: Colors.grey,),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Account account = context.watch<EKodi>().account;
@@ -390,22 +496,13 @@ class _TenantDashState extends State<TenantDash> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    SizedBox(height: size.height*0.05,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text("Dashboard", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),),
-                        SizedBox(
-                          height: 80.0,
-                          width: size.width*0.15,
-                          child: AuthTextField(
-                            controller: searchController,
-                            prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20.0,),
-                            hintText: "Search here...",
-                            inputType: TextInputType.text,
-                            isObscure: false,
-                          ),
-                        )
+                        dateSelector(startDate: startDate, endDate: endDate)
                       ],
                     ),
                     Row(
@@ -429,6 +526,14 @@ class _TenantDashState extends State<TenantDash> {
                               ),
                             ),
                             subtitle: const Text("Welcome to e-KODI! Here's your activity today."),
+                            trailing: RaisedButton.icon(
+                              elevation: 0.0,
+                              hoverColor: Colors.transparent,
+                              color: Colors.deepPurple.shade100,
+                              icon: const Icon(Icons.cloud_download_outlined, color: Colors.deepPurple,),
+                              label: const Text("Download Report", style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold)),
+                              onPressed: () {},
+                            ),
                           ),
                         )
                       ],
@@ -454,6 +559,14 @@ class _TenantDashState extends State<TenantDash> {
                                   ListTile(
                                     title: const Text("Billing", style: TextStyle(fontWeight: FontWeight.bold,),),
                                     subtitle: displayPeriod(startDate, endDate),
+                                    trailing: RaisedButton.icon(
+                                      elevation: 0.0,
+                                      hoverColor: Colors.transparent,
+                                      color: Colors.deepPurple.shade100,
+                                      icon: const Icon(Icons.add, color: Colors.deepPurple,),
+                                      label: const Text("Add Bill", style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold)),
+                                      onPressed: () {},
+                                    ),
                                   ),
                                   const Text("My Property", style: TextStyle(fontWeight: FontWeight.bold,),),
                                   FutureBuilder<QuerySnapshot>(
@@ -613,13 +726,12 @@ class _TenantDashState extends State<TenantDash> {
                                                         Row(
                                                           mainAxisAlignment: MainAxisAlignment.end,
                                                           children: [
-                                                            RaisedButton.icon(
+                                                            RaisedButton(
                                                               color: Colors.deepPurple,
                                                               shape: RoundedRectangleBorder(
                                                                 borderRadius: BorderRadius.circular(5.0),
                                                               ),
-                                                              icon: const Icon(Icons.currency_exchange_rounded, color: Colors.white,),
-                                                              label: const Text("Pay Rent", style: TextStyle(color: Colors.white),),
+                                                              child: const Text("Pay Rent", style: TextStyle(color: Colors.white),),
                                                               onPressed: () {},
                                                             ),
                                                             SizedBox(width: 5.0,),
@@ -749,13 +861,9 @@ class _TenantDashState extends State<TenantDash> {
                                       if(units.isEmpty)
                                       {
                                         return Center(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: const [
-                                              //Icon(Icons.noth, color: Colors.grey, size: 70.0,),
-                                              SizedBox(height: 10.0,),
-                                              Text("You currently don't have a unit", style: TextStyle(color: Colors.grey),)
-                                            ],
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: _buildNoDataCircle(size),
                                           ),
                                         );
                                       }
@@ -876,16 +984,26 @@ class _TenantDashState extends State<TenantDash> {
 
                                   return Padding(
                                     padding: const EdgeInsets.all(5.0),
-                                    child: Card(
-                                      child: ListTile(
-                                        leading: ClipRRect(
-                                          borderRadius: BorderRadius.circular(15.0),
-                                          child: provider.photoUrl!  == ""
-                                              ? Image.asset("assets/profile.png", height: 30.0, width: 30.0, fit: BoxFit.cover,)
-                                              : Image.network(provider.photoUrl!, height: 30.0, width: 30.0,fit: BoxFit.cover),
+                                    child: InkWell(
+                                      child: Card(
+                                        child: ListTile(
+                                          leading: ClipRRect(
+                                            borderRadius: BorderRadius.circular(15.0),
+                                            child: provider.photoUrl!  == ""
+                                                ? Image.asset("assets/profile.png", height: 30.0, width: 30.0, fit: BoxFit.cover,)
+                                                : Image.network(provider.photoUrl!, height: 30.0, width: 30.0,fit: BoxFit.cover),
+                                          ),
+                                          title: Text(provider.title!, style: const TextStyle(fontWeight: FontWeight.bold),),
+                                          subtitle: Text(provider.description!, maxLines: 3, overflow: TextOverflow.ellipsis,),
+                                          trailing: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.star_rate_outlined, color: Colors.grey,),
+                                              Text("${provider.rating} rating")
+                                            ],
+                                          ),
                                         ),
-                                        title: Text(provider.title!, style: const TextStyle(fontWeight: FontWeight.bold),),
-                                        subtitle: Text(provider.description!, maxLines: 3, overflow: TextOverflow.ellipsis,),
                                       ),
                                     ),
                                   );
