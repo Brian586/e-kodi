@@ -384,55 +384,57 @@ class _TenantDashState extends State<TenantDash> {
             flex: 7,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: size.width*0.05),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("Dashboard", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),),
-                      SizedBox(
-                        height: 80.0,
-                        width: size.width*0.15,
-                        child: AuthTextField(
-                          controller: searchController,
-                          prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20.0,),
-                          hintText: "Search here...",
-                          inputType: TextInputType.text,
-                          isObscure: false,
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(35.0),
-                        child: account.photoUrl!  == ""
-                            ? Image.asset("assets/profile.png", height: 70.0, width: 70.0, fit: BoxFit.cover,)
-                            : Image.network(account.photoUrl!, height: 70.0, width: 70.0,fit: BoxFit.cover),
-                      ),
-                      Expanded(
-                        child: ListTile(
-                          title: RichText(
-                            text: TextSpan(
-                              //style: DefaultTextStyle.of(context).style,
-                              children: <TextSpan>[
-                                TextSpan(text: 'Hi, ', style: GoogleFonts.baloo2(fontSize: 20.0)),
-                                TextSpan(text: account.name, style: GoogleFonts.baloo2(fontSize: 20.0, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Dashboard", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),),
+                        SizedBox(
+                          height: 80.0,
+                          width: size.width*0.15,
+                          child: AuthTextField(
+                            controller: searchController,
+                            prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20.0,),
+                            hintText: "Search here...",
+                            inputType: TextInputType.text,
+                            isObscure: false,
                           ),
-                          subtitle: const Text("Welcome to e-KODI! Here's your activity today."),
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(35.0),
+                          child: account.photoUrl!  == ""
+                              ? Image.asset("assets/profile.png", height: 70.0, width: 70.0, fit: BoxFit.cover,)
+                              : Image.network(account.photoUrl!, height: 70.0, width: 70.0,fit: BoxFit.cover),
                         ),
-                      )
-                    ],
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
+                        Expanded(
+                          child: ListTile(
+                            title: RichText(
+                              text: TextSpan(
+                                //style: DefaultTextStyle.of(context).style,
+                                children: <TextSpan>[
+                                  TextSpan(text: 'Hi, ', style: GoogleFonts.baloo2(fontSize: 20.0)),
+                                  TextSpan(text: account.name, style: GoogleFonts.baloo2(fontSize: 20.0, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                            subtitle: const Text("Welcome to e-KODI! Here's your activity today."),
+                          ),
+                        )
+                      ],
+                    ),
+                    Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Container(
+                        width: size.width,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.0),
                           border: Border.all(
@@ -452,40 +454,41 @@ class _TenantDashState extends State<TenantDash> {
                                     subtitle: displayPeriod(startDate, endDate),
                                   ),
                                   const Text("My Property", style: TextStyle(fontWeight: FontWeight.bold,),),
-                                  Expanded(
-                                    child: FutureBuilder<QuerySnapshot>(
-                                      future: unitSnapshot,
-                                      builder: (context, snapshot) {
-                                        if(!snapshot.hasData)
-                                          {
-                                            return Text("Loading...");
-                                          }
-                                        else
-                                          {
-                                            List<Unit> units = [];
+                                  FutureBuilder<QuerySnapshot>(
+                                    future: unitSnapshot,
+                                    builder: (context, snapshot) {
+                                      if(!snapshot.hasData)
+                                        {
+                                          return Text("Loading...");
+                                        }
+                                      else
+                                        {
+                                          List<Unit> units = [];
 
-                                            snapshot.data!.docs.forEach((element) {
-                                              Unit unit = Unit.fromDocument(element);
+                                          snapshot.data!.docs.forEach((element) {
+                                            Unit unit = Unit.fromDocument(element);
 
-                                              units.add(unit);
-                                            });
+                                            units.add(unit);
+                                          });
 
-                                            if(units.isEmpty)
-                                              {
-                                                return Center(
-                                                  child: Column(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: const [
-                                                      Icon(Icons.house_rounded, color: Colors.grey, size: 70.0,),
-                                                      SizedBox(height: 10.0,),
-                                                      Text("You currently don't have a unit", style: TextStyle(color: Colors.grey),)
-                                                    ],
-                                                  ),
-                                                );
-                                              }
-                                            else
-                                              {
-                                                return Card(
+                                          if(units.isEmpty)
+                                            {
+                                              return Center(
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: const [
+                                                    Icon(Icons.house_rounded, color: Colors.grey, size: 70.0,),
+                                                    SizedBox(height: 10.0,),
+                                                    Text("You currently don't have a unit", style: TextStyle(color: Colors.grey),)
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          else
+                                            {
+                                              return SizedBox(
+                                                width: size.width,
+                                                child: Card(
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius: BorderRadius.circular(10.0),
                                                   ),
@@ -496,115 +499,113 @@ class _TenantDashState extends State<TenantDash> {
                                                       mainAxisSize: MainAxisSize.min,
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
-                                                        Expanded(
-                                                          child: FutureBuilder<DocumentSnapshot>(
-                                                            future: FirebaseFirestore.instance.collection("properties").doc(units[0].propertyID).get(),
-                                                            builder: (context, snap) {
-                                                              if(!snap.hasData)
-                                                              {
-                                                                return const Text("Property Info Loading");
-                                                              }
-                                                              else {
+                                                        FutureBuilder<DocumentSnapshot>(
+                                                          future: FirebaseFirestore.instance.collection("properties").doc(units[0].propertyID).get(),
+                                                          builder: (context, snap) {
+                                                            if(!snap.hasData)
+                                                            {
+                                                              return const Text("Property Info Loading");
+                                                            }
+                                                            else {
 
-                                                                Property property = Property.fromDocument(snap.data!);
+                                                              Property property = Property.fromDocument(snap.data!);
 
-                                                                return Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                                  mainAxisSize: MainAxisSize.min,
-                                                                  children: [
-                                                                    Text(property.name!, style: const TextStyle(fontWeight: FontWeight.bold,)),
-                                                                    //const SizedBox(height: 5.0,),
-                                                                    Text("${property.address}, ${property.city} ${property.country}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),),
-                                                                    //const SizedBox(height: 5.0,),
-                                                                    Text(property.notes!, maxLines: 2, overflow: TextOverflow.ellipsis,),
-                                                                    Divider(color: Colors.grey.shade300,),
-                                                                    Expanded(
-                                                                      child: Row(
-                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              return Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                                mainAxisSize: MainAxisSize.min,
+                                                                children: [
+                                                                  Text(property.name!, style: const TextStyle(fontWeight: FontWeight.bold,)),
+                                                                  //const SizedBox(height: 5.0,),
+                                                                  Text("${property.address}, ${property.city} ${property.country}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),),
+                                                                  //const SizedBox(height: 5.0,),
+                                                                  Text(property.notes!, maxLines: 2, overflow: TextOverflow.ellipsis,),
+                                                                  Divider(color: Colors.grey.shade300,),
+                                                                  Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child: Column(
+                                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                                          mainAxisSize: MainAxisSize.min,
+                                                                          children: [
+                                                                            //Text("Unit Information"),
+                                                                            Text(units[0].name!, style: const TextStyle(fontWeight: FontWeight.bold,)),
+                                                                            Text(units[0].description!, maxLines: 5, overflow: TextOverflow.ellipsis,),
+                                                                            Text("Started on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].startDate!)), style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                      Column(
                                                                         children: [
-                                                                          Expanded(
-                                                                            child: Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                                              mainAxisSize: MainAxisSize.min,
-                                                                              children: [
-                                                                                //Text("Unit Information"),
-                                                                                Text(units[0].name!, style: const TextStyle(fontWeight: FontWeight.bold,)),
-                                                                                Text(units[0].description!, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                                                                                Text("Started on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].startDate!)), style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
-                                                                              ],
+                                                                          Padding(
+                                                                            padding: const EdgeInsets.all(2.0),
+                                                                            child: Container(
+                                                                              width: size.width*0.15,
+                                                                              //height: 100.0,
+                                                                              decoration: BoxDecoration(
+                                                                                borderRadius: BorderRadius.circular(5.0),
+                                                                                border: Border.all(
+                                                                                  width: 1.0,
+                                                                                  color: Colors.grey.shade300,
+                                                                                )
+                                                                              ),
+                                                                              child: Center(
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                                                                  child: Column(
+                                                                                    mainAxisSize: MainAxisSize.min,
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      const Text("Rent Amount", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0),),
+                                                                                      Text("KES " + NumberFormat("###,###.0#", "en_US").format(units[0].rent), style: const TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold),),
+                                                                                      const SizedBox(height: 5.0,),
+                                                                                      Text("Due on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].dueDate!)), style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                              ),
                                                                             ),
                                                                           ),
-                                                                          Column(
-                                                                            children: [
-                                                                              Expanded(
-                                                                                flex: 1,
+                                                                          Padding(
+                                                                            padding: const EdgeInsets.all(2.0),
+                                                                            child: Container(
+                                                                              width: size.width*0.15,
+                                                                              //height: 100.0,
+                                                                              decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                                  border: Border.all(
+                                                                                    width: 1.0,
+                                                                                    color: Colors.grey.shade300,
+                                                                                  )
+                                                                              ),
+                                                                              child: Center(
                                                                                 child: Padding(
-                                                                                  padding: const EdgeInsets.all(2.0),
-                                                                                  child: Container(
-                                                                                    width: size.width*0.15,
-                                                                                    decoration: BoxDecoration(
-                                                                                      borderRadius: BorderRadius.circular(5.0),
-                                                                                      border: Border.all(
-                                                                                        width: 1.0,
-                                                                                        color: Colors.grey.shade300,
-                                                                                      )
-                                                                                    ),
-                                                                                    child: Center(
-                                                                                      child: Column(
-                                                                                        mainAxisSize: MainAxisSize.min,
-                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                        children: [
-                                                                                          const Text("Rent Amount", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0),),
-                                                                                          Text("KES " + NumberFormat("###,###.0#", "en_US").format(units[0].rent), style: const TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold),),
-                                                                                          const SizedBox(height: 5.0,),
-                                                                                          Text("Due on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].dueDate!)), style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
-                                                                                        ],
-                                                                                      ),
-                                                                                    ),
+                                                                                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                                                                  child: Column(
+                                                                                    mainAxisSize: MainAxisSize.min,
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      const Text("Deposit Amount", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0),),
+                                                                                      Text("KES " + NumberFormat("###,###.0#", "en_US").format(units[0].deposit), style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),),
+                                                                                      // const SizedBox(height: 5.0,),
+                                                                                      // Text("Due on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].dueDate!)), style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
+                                                                                    ],
                                                                                   ),
                                                                                 ),
                                                                               ),
-                                                                              Expanded(
-                                                                                flex: 1,
-                                                                                child: Padding(
-                                                                                  padding: const EdgeInsets.all(2.0),
-                                                                                  child: Container(
-                                                                                    width: size.width*0.15,
-                                                                                    decoration: BoxDecoration(
-                                                                                        borderRadius: BorderRadius.circular(5.0),
-                                                                                        border: Border.all(
-                                                                                          width: 1.0,
-                                                                                          color: Colors.grey.shade300,
-                                                                                        )
-                                                                                    ),
-                                                                                    child: Center(
-                                                                                      child: Column(
-                                                                                        mainAxisSize: MainAxisSize.min,
-                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                        children: [
-                                                                                          const Text("Deposit Amount", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0),),
-                                                                                          Text("KES " + NumberFormat("###,###.0#", "en_US").format(units[0].deposit), style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),),
-                                                                                          // const SizedBox(height: 5.0,),
-                                                                                          // Text("Due on: " + DateFormat("dd MMM yyyy").format(DateTime.fromMillisecondsSinceEpoch(units[0].dueDate!)), style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),),
-                                                                                        ],
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              const SizedBox(height: 10.0,)
-                                                                            ],
-                                                                          )
+                                                                            ),
+                                                                          ),
+                                                                          const SizedBox(height: 10.0,)
                                                                         ],
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                );
-                                                              }
-                                                            },
-                                                          ),
+                                                                      )
+                                                                    ],
+                                                                  )
+                                                                ],
+                                                              );
+                                                            }
+                                                          },
                                                         ),
 
                                                         Row(
@@ -642,11 +643,11 @@ class _TenantDashState extends State<TenantDash> {
                                                       ],
                                                     ),
                                                   ),
-                                                );
-                                              }
-                                          }
-                                      },
-                                    ),
+                                                ),
+                                              );
+                                            }
+                                        }
+                                    },
                                   )
                                 ],
                               ),
@@ -659,10 +660,7 @@ class _TenantDashState extends State<TenantDash> {
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Row(
+                    Row(
                       children: [
                         Expanded(
                           flex: 1,
@@ -760,8 +758,8 @@ class _TenantDashState extends State<TenantDash> {
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -10,6 +10,7 @@ import 'package:rekodi/model/property.dart';
 import 'package:rekodi/model/tabItem.dart';
 import 'package:rekodi/providers/datePeriod.dart';
 import 'package:rekodi/widgets/customTextField.dart';
+import 'package:rekodi/widgets/loadingAnimation.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -263,6 +264,7 @@ class _LandlordDashState extends State<LandlordDash> {
 
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
           title: const Text("Property Revenue Overview", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
@@ -290,9 +292,11 @@ class _LandlordDashState extends State<LandlordDash> {
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Container(
                       height: 30.0,
@@ -317,6 +321,7 @@ class _LandlordDashState extends State<LandlordDash> {
                 ),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: const [
                     Text("Week", style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),),
                     SizedBox(width: 10.0,),
@@ -329,127 +334,122 @@ class _LandlordDashState extends State<LandlordDash> {
             ),
           ),
         ),
-        Container(height: 1, width: size.width,  color: Colors.grey,),
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(
-                //flex: 3,
-                child: _buildSpacingColumnChart(),
-              ),
-              Column(
-                children: [
-                  Expanded(
-                    flex: 1,
+        Divider(color: Colors.grey.shade400, height: 0.5, thickness: 0.5,),
+        Row(
+          children: [
+            Expanded(
+              //flex: 3,
+              child: _buildSpacingColumnChart(),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Container(
+                    width: size.width*0.12,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 0.5
+                      )
+                    ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                      child: Container(
-                        width: size.width*0.12,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          border: Border.all(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Kes 46,690", style: TextStyle(fontSize: 18.0, color: Colors.deepPurple, fontWeight: FontWeight.bold),),
+                          const SizedBox(width: 20.0,),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text("Money in", style: TextStyle(fontSize: 11.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                              SizedBox(width: 5.0,),
+                              Icon(Icons.trending_up_rounded, color: Colors.teal,),
+                              Text("5.8%", style: TextStyle(fontSize: 11.0, color: Colors.teal, fontWeight: FontWeight.bold),),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Container(
+                    width: size.width*0.12,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        border: Border.all(
                             color: Colors.grey,
                             width: 0.5
+                        )
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Kes 8,940", style: TextStyle(fontSize: 18.0, color: Colors.orange, fontWeight: FontWeight.bold),),
+                          const SizedBox(width: 20.0,),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text("Money out", style: TextStyle(fontSize: 11.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                              SizedBox(width: 5.0,),
+                              Icon(Icons.trending_down_rounded, color: Colors.red,),
+                              Text("26.4%", style: TextStyle(fontSize: 11.0, color: Colors.red, fontWeight: FontWeight.bold),),
+                            ],
                           )
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text("Kes 46,690", style: TextStyle(fontSize: 18.0, color: Colors.deepPurple, fontWeight: FontWeight.bold),),
-                              const SizedBox(width: 20.0,),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text("Money in", style: TextStyle(fontSize: 11.0, color: Colors.grey, fontWeight: FontWeight.bold),),
-                                  SizedBox(width: 5.0,),
-                                  Icon(Icons.trending_up_rounded, color: Colors.teal,),
-                                  Text("5.8%", style: TextStyle(fontSize: 11.0, color: Colors.teal, fontWeight: FontWeight.bold),),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child:Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                      child: Container(
-                        width: size.width*0.12,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            border: Border.all(
-                                color: Colors.grey,
-                                width: 0.5
-                            )
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text("Kes 8,940", style: TextStyle(fontSize: 18.0, color: Colors.orange, fontWeight: FontWeight.bold),),
-                              const SizedBox(width: 20.0,),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text("Money out", style: TextStyle(fontSize: 11.0, color: Colors.grey, fontWeight: FontWeight.bold),),
-                                  SizedBox(width: 5.0,),
-                                  Icon(Icons.trending_down_rounded, color: Colors.red,),
-                                  Text("26.4%", style: TextStyle(fontSize: 11.0, color: Colors.red, fontWeight: FontWeight.bold),),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         )
       ],
     );
   }
 
   displayTab(Size size, SizingInformation sizeInfo, {int? start, int? end}) {
-    bool isMobile = sizeInfo.isMobile;
 
     switch (selected) {
       case "Dashboard":
         return Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10.0, right: 15.0, bottom: 5.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
-                      color: properties.isNotEmpty ? Colors.white : Colors.transparent,
-                      boxShadow: properties.isNotEmpty ? [
-                        const BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 1,
-                            spreadRadius: 1.0,
-                            offset: Offset(0.0, 0.0)
-                        )
-                      ] : [],
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                        width: properties.isNotEmpty ? 0.0 : 1.0,
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0, right: 15.0, bottom: 5.0),
+              child: Container(
+                width: size.width,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    color: properties.isNotEmpty ? Colors.white : Colors.transparent,
+                    boxShadow: properties.isNotEmpty ? [
+                      const BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 1,
+                          spreadRadius: 1.0,
+                          offset: Offset(0.0, 0.0)
                       )
-                  ),
-                  child: properties.isNotEmpty ? revenueOverview(startDate: start, endDate: end) : Center(
+                    ] : [],
+                    border: Border.all(
+                      color: Colors.grey.shade300,
+                      width: properties.isNotEmpty ? 0.0 : 1.0,
+                    )
+                ),
+                child: properties.isNotEmpty ? revenueOverview(startDate: start, endDate: end) : Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 30.0),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -467,144 +467,128 @@ class _LandlordDashState extends State<LandlordDash> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 5.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 5.0),
-                        child: Container(
-                          width: size.width,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(3.0),
-                              color: Colors.white,
-                              boxShadow: const [
-                                BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 1,
-                                    spreadRadius: 1.0,
-                                    offset: Offset(0.0, 0.0)
-                                )
-                              ],
-                              border: Border.all(width: 0.5, color: Colors.grey.shade300)
-                          ),
-                          child: Column(
-                            children: [
-                              const ListTile(
-                                title: Text('Recent Transactions', style: TextStyle(fontWeight: FontWeight.bold),),
-                                trailing: Text('See all', style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),),
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                      height: 30.0,
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(width: 2.0, color: Colors.deepPurple.shade900),
-                                        ),
-                                      ),
-                                      child: const Center(child: Text("Incoming Requests", style: TextStyle(fontWeight: FontWeight.bold),),),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                      height: 30.0,
-                                      decoration: const BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(width: 2.0, color: Colors.transparent),
-                                        ),
-                                      ),
-                                      child: const Center(child: Text("Assigned to me", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),),),
-                                    ),
-                                  ),
-                                ],
+            Padding(
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 5.0),
+                      child: Container(
+                        width: size.width,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3.0),
+                            color: Colors.white,
+                            boxShadow: const [
+                              BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 1,
+                                  spreadRadius: 1.0,
+                                  offset: Offset(0.0, 0.0)
                               )
                             ],
-                          ),
+                            border: Border.all(width: 0.5, color: Colors.grey.shade300)
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const ListTile(
+                              title: Text('Recent Transactions', style: TextStyle(fontWeight: FontWeight.bold),),
+                              trailing: Text('See all', style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),),
+                            ),
+                            Divider(color: Colors.grey.shade300,),
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.currency_exchange_rounded, color: Colors.grey.shade300,),
+                                    SizedBox(height: 5.0,),
+                                    Text("No transactions")
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 15.0, left: 5.0),
-                        child: Container(
-                          width: size.width,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(3.0),
-                              color: Colors.white,
-                              boxShadow: const [
-                                BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 1,
-                                    spreadRadius: 1.0,
-                                    offset: Offset(0.0, 0.0)
-                                )
-                              ],
-                              border: Border.all(width: 0.5, color: Colors.grey.shade300)
-                          ),
-                          child: Column(
-                            children: [
-                              const ListTile(
-                                title: Text('Expiring Leases', style: TextStyle(fontWeight: FontWeight.bold),),
-                                trailing: Text('See details', style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),),
-                              ),
-                              Expanded(
-                                child: Center(
-                                  child: pie_chart.PieChart(
-                                    dataMap: const {
-                                      "<30 days": 8,
-                                      "31-60 days": 16,
-                                      "61-90 days": 22
-                                    },
-                                    animationDuration: const Duration(milliseconds: 800),
-                                    chartLegendSpacing: 32,
-                                    chartRadius: size.width*0.1,
-                                    colorList: const [
-                                      Colors.pink,
-                                      Colors.orange,
-                                      Colors.blueAccent
-                                    ],
-                                    initialAngleInDegree: 0,
-                                    chartType: pie_chart.ChartType.ring,
-                                    ringStrokeWidth: 15,
-                                    centerText: "46 Properties",
-                                    legendOptions: const pie_chart.LegendOptions(
-                                      showLegendsInRow: true,
-                                      legendPosition: pie_chart.LegendPosition.bottom,
-                                      showLegends: true,
-                                      //legendShape: _BoxShape.circle,
-                                      legendTextStyle: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey, fontSize: 15.0
-                                      ),
-                                    ),
-                                    chartValuesOptions: const pie_chart.ChartValuesOptions(
-                                      showChartValueBackground: true,
-                                      showChartValues: true,
-                                      showChartValuesInPercentage: false,
-                                      showChartValuesOutside: true,
-                                      decimalPlaces: 0,
-                                    ),
-                                    // gradientList: ---To add gradient colors---
-                                    // emptyColorGradient: ---Empty Color gradient---
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 15.0, left: 5.0),
+                      child: Container(
+                        width: size.width,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3.0),
+                            color: Colors.white,
+                            boxShadow: const [
+                              BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 1,
+                                  spreadRadius: 1.0,
+                                  offset: Offset(0.0, 0.0)
+                              )
+                            ],
+                            border: Border.all(width: 0.5, color: Colors.grey.shade300)
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const ListTile(
+                              title: Text('Expiring Leases', style: TextStyle(fontWeight: FontWeight.bold),),
+                              trailing: Text('See details', style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),),
+                            ),
+                            Center(
+                              child: pie_chart.PieChart(
+                                dataMap: const {
+                                  "<30 days": 8,
+                                  "31-60 days": 16,
+                                  "61-90 days": 22
+                                },
+                                animationDuration: const Duration(milliseconds: 800),
+                                chartLegendSpacing: 32,
+                                chartRadius: size.width*0.1,
+                                colorList: const [
+                                  Colors.pink,
+                                  Colors.orange,
+                                  Colors.blueAccent
+                                ],
+                                initialAngleInDegree: 0,
+                                chartType: pie_chart.ChartType.ring,
+                                ringStrokeWidth: 15,
+                                centerText: "46 Properties",
+                                legendOptions: const pie_chart.LegendOptions(
+                                  showLegendsInRow: true,
+                                  legendPosition: pie_chart.LegendPosition.bottom,
+                                  showLegends: true,
+                                  //legendShape: _BoxShape.circle,
+                                  legendTextStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey, fontSize: 15.0
                                   ),
                                 ),
-                              )
-                            ],
-                          ),
+                                chartValuesOptions: const pie_chart.ChartValuesOptions(
+                                  showChartValueBackground: true,
+                                  showChartValues: true,
+                                  showChartValuesInPercentage: false,
+                                  showChartValuesOutside: true,
+                                  decimalPlaces: 0,
+                                ),
+                                // gradientList: ---To add gradient colors---
+                                // emptyColorGradient: ---Empty Color gradient---
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             )
           ],
@@ -652,6 +636,119 @@ class _LandlordDashState extends State<LandlordDash> {
       //   _rangeCount = args.value.length.toString();
       // }
     });
+  }
+
+  displayProperties(Account account) {
+    Size size = MediaQuery.of(context).size;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("My Properties"),
+              Divider(color: Colors.grey.shade300,)
+            ],
+          ),
+          content: Container(
+            height: size.height*0.6,
+            width: size.width*0.4,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.0)
+            ),
+            child: FutureBuilder<QuerySnapshot>(
+              future: FirebaseFirestore.instance.collection("properties")
+                  .where("publisherID", isEqualTo:  account.userID).orderBy("timestamp", descending: true).get(),
+              builder: (context, snapshot) {
+                if(!snapshot.hasData)
+                  {
+                    return const LoadingAnimation();
+                  }
+                else
+                  {
+                    List<Property> properties = [];
+
+                    snapshot.data!.docs.forEach((element) {
+                      properties.add(Property.fromDocument(element));
+                    });
+
+                    if(properties.isEmpty)
+                      {
+                        return const Center(
+                          child: Text("You don't have properties", style: TextStyle(color: Colors.grey),),
+                        );
+                      }
+                    else
+                      {
+                        return ListView.builder(
+                          itemCount: properties.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            Property property = properties[index];
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.pushNamed(context, "/property_details", arguments: property);
+                                },
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0)
+                                  ),
+                                  child: ListTile(
+                                    leading: const Icon(Icons.house_rounded, color: Colors.grey, size: 30.0,),
+                                    title: Text(property.name!, style: const TextStyle(fontWeight: FontWeight.bold),),
+                                    subtitle: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Published on " + DateFormat("dd MMM").format(DateTime.fromMillisecondsSinceEpoch(property.timestamp!)),
+                                          maxLines: 2, overflow: TextOverflow.ellipsis,),
+                                        Text("Units: ${property.units}", style: const TextStyle(fontWeight: FontWeight.bold))
+                                      ],
+                                    ),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Text(property.vacant!.toString()),
+                                            Text("Vacant")
+                                          ]
+                                        ),
+                                        const SizedBox(width: 5.0,),
+                                        Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(property.occupied!.toString()),
+                                              Text("Occupied")
+                                            ]
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                  }
+              },
+            ),
+          ),
+        );
+      },
+    );
   }
 
   displayCalendar(int startDate, int endDate) {
@@ -802,12 +899,8 @@ class _LandlordDashState extends State<LandlordDash> {
               const SizedBox(width: 20.0,),
             ],
           ),
-          body:  loading ? Container(
-              height: size.height,
-              width: size.width,
-              color: Colors.white,
-              child: Center(child: Image.asset("assets/loading.gif"),)) : Column(
-            mainAxisSize: MainAxisSize.min,
+          body:  loading ? const LoadingAnimation() : Column(
+            //mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: size.width,
@@ -880,237 +973,245 @@ class _LandlordDashState extends State<LandlordDash> {
                   ),
                 ),
               ),
-              SizedBox(
-                width: size.width,
-                height: 60.0,
-                child:  Padding(
-                  padding: EdgeInsets.symmetric(horizontal: size.width*0.08),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(selected, style: Theme.of(context).textTheme.titleSmall!.apply(color: Colors.black, fontWeightDelta: 10),),
-                          Text("Hi ${account.name!}, Welcome to e-Ekodi", style: TextStyle(color: Colors.grey, fontSize: 13.0, fontWeight: FontWeight.bold),)
-                        ],
-                      ),
-                      dateSelector(startDate: startDate, endDate: endDate)
-                    ],
-                  ),
-                ),
-              ),
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: size.width*0.08),
-                  child: Row(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Expanded(
-                        flex: 7,
-                        child: SizedBox(
-                          width: size.width,
-                          height: size.height,
-                          child: displayTab(size, sizeInfo, start: startDate, end: endDate),
+                      SizedBox(
+                        width: size.width,
+                        height: 60.0,
+                        child:  Padding(
+                          padding: EdgeInsets.symmetric(horizontal: size.width*0.08),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(selected, style: Theme.of(context).textTheme.titleSmall!.apply(color: Colors.black, fontWeightDelta: 10),),
+                                  Text("Hi ${account.name!}, Welcome to e-Ekodi", style: TextStyle(color: Colors.grey, fontSize: 13.0, fontWeight: FontWeight.bold),)
+                                ],
+                              ),
+                              dateSelector(startDate: startDate, endDate: endDate)
+                            ],
+                          ),
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Column(
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: size.width*0.08),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10.0),
-                              child: Container(
+                            Expanded(
+                              flex: 7,
+                              child: SizedBox(
                                 width: size.width,
-                                //height: 100.0,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(3.0),
-                                    color: Colors.white,
-                                    boxShadow: const [
-                                      BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 1,
-                                          spreadRadius: 1.0,
-                                          offset: Offset(0.0, 0.0)
-                                      )
-                                    ],
-                                    border: Border.all(width: 0.5, color: Colors.grey.shade300)
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      leading: Icon(Icons.apartment_rounded, size: 30.0, color: Colors.deepPurple.withOpacity(0.5),),
-                                      title: Text(properties.length.toString(), style: const TextStyle(fontWeight: FontWeight.bold),),
-                                      subtitle: const Text("Properties", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),),
-                                      trailing: TextButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(context, "/properties");
-                                        },
-                                        child: const Text("See all properties >", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),),
-                                      )
-                                    ),
-                                    //const SizedBox(height: 10.0,),
-                                    Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: Container(
-                                        width: size.width,
-                                        decoration: BoxDecoration(
-                                          color: Colors.deepPurple.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(5.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Text(vacantUnits.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
-                                                  const SizedBox(height: 5.0,),
-                                                  const Text("Vacant", style: TextStyle(fontSize: 15.0,  color: Colors.grey, fontWeight: FontWeight.bold),),
-                                                ],
-                                              ),
-                                              const VerticalDivider(width: 1.0,),
-                                              Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Text(occupiedUnits.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
-                                                  const SizedBox(height: 5.0,),
-                                                  const Text("Occupied", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
-                                                ],
-                                              ),
-                                              // const VerticalDivider(width: 1.0,),
-                                              // Column(
-                                              //   mainAxisSize: MainAxisSize.min,
-                                              //   crossAxisAlignment: CrossAxisAlignment.center,
-                                              //   children: const [
-                                              //     Text("16", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
-                                              //     SizedBox(height: 5.0,),
-                                              //     Text("Unlisted", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
-                                              //   ],
-                                              // ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(3.0),
-                                    color: Colors.white,
-                                    boxShadow: const [
-                                      BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 1,
-                                          spreadRadius: 1.0,
-                                          offset: Offset(0.0, 0.0)
-                                      )
-                                    ],
-                                    border: Border.all(width: 0.5, color: Colors.grey.shade300)
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.all(15.0),
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        title: Text("Last 30 days", style: TextStyle(fontWeight: FontWeight.bold),),
-                                        trailing: Icon(Icons.more_horiz, color: Colors.grey,),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: const [
-                                              Text("Kes 36,840", style: TextStyle(fontSize: 18.0, color: Colors.teal, fontWeight: FontWeight.bold),),
-                                              SizedBox(height: 5.0,),
-                                              Text("paid invoices", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
-                                            ],
-                                          ),
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: const [
-                                              Text("Kes 8,420", style: TextStyle(fontSize: 18.0, color: Colors.red, fontWeight: FontWeight.bold),),
-                                              SizedBox(height: 5.0,),
-                                              Text("open invoices", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          RaisedButton.icon(
-                                            elevation: 0.0,
-                                            hoverColor: Colors.transparent,
-                                            color: Colors.deepPurple.shade100,
-                                            icon: const Icon(Icons.paid_outlined, color: Colors.deepPurple,),
-                                            label: const Text("Receive Payments", style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold)),
-                                            onPressed: () {},
-                                          ),
-                                          const Text("View All", style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold))
-                                        ],
-                                      ),
-                                    ),
-
-                                  ],
-                                ),
+                                height: size.height,
+                                child: displayTab(size, sizeInfo, start: startDate, end: endDate),
                               ),
                             ),
                             Expanded(
-                              child: Container(
-                                width: size.width,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(3.0),
-                                    color: Colors.white,
-                                    boxShadow: const [
-                                      BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 1,
-                                          spreadRadius: 1.0,
-                                          offset: Offset(0.0, 0.0)
-                                      )
-                                    ],
-                                    border: Border.all(width: 0.5, color: Colors.grey.shade300)
-                                ),
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text("KES 6,280", style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),),
-                                      trailing: IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.more_horiz, color: Colors.grey,),
+                              flex: 3,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                    child: Container(
+                                      width: size.width,
+                                      //height: 100.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(3.0),
+                                          color: Colors.white,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                                color: Colors.black12,
+                                                blurRadius: 1,
+                                                spreadRadius: 1.0,
+                                                offset: Offset(0.0, 0.0)
+                                            )
+                                          ],
+                                          border: Border.all(width: 0.5, color: Colors.grey.shade300)
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ListTile(
+                                              leading: Icon(Icons.apartment_rounded, size: 30.0, color: Colors.deepPurple.withOpacity(0.5),),
+                                              title: Text(properties.length.toString(), style: const TextStyle(fontWeight: FontWeight.bold),),
+                                              subtitle: const Text("Properties", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),),
+                                              trailing: TextButton(
+                                                onPressed: () => displayProperties(account),
+                                                child: const Text("See all properties >", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),),
+                                              )
+                                          ),
+                                          //const SizedBox(height: 10.0,),
+                                          Padding(
+                                            padding: const EdgeInsets.all(15.0),
+                                            child: Container(
+                                              width: size.width,
+                                              decoration: BoxDecoration(
+                                                color: Colors.deepPurple.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(5.0),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(10.0),
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                  children: [
+                                                    Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        Text(vacantUnits.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+                                                        const SizedBox(height: 5.0,),
+                                                        const Text("Vacant", style: TextStyle(fontSize: 15.0,  color: Colors.grey, fontWeight: FontWeight.bold),),
+                                                      ],
+                                                    ),
+                                                    const VerticalDivider(width: 1.0,),
+                                                    Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        Text(occupiedUnits.toString(), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+                                                        const SizedBox(height: 5.0,),
+                                                        const Text("Occupied", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                                                      ],
+                                                    ),
+                                                    // const VerticalDivider(width: 1.0,),
+                                                    // Column(
+                                                    //   mainAxisSize: MainAxisSize.min,
+                                                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                                                    //   children: const [
+                                                    //     Text("16", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+                                                    //     SizedBox(height: 5.0,),
+                                                    //     Text("Unlisted", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                                                    //   ],
+                                                    // ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    const ListTile(
-                                      title: Text("Outstanding Balances", style: TextStyle(fontWeight: FontWeight.bold),),
-                                      subtitle: Text("All properties", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),),
-                                      trailing: Icon(Icons.equalizer, color: Colors.teal, size: 30.0,),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(3.0),
+                                          color: Colors.white,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                                color: Colors.black12,
+                                                blurRadius: 1,
+                                                spreadRadius: 1.0,
+                                                offset: Offset(0.0, 0.0)
+                                            )
+                                          ],
+                                          border: Border.all(width: 0.5, color: Colors.grey.shade300)
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.all(15.0),
+                                            child: ListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              title: Text("Last 30 days", style: TextStyle(fontWeight: FontWeight.bold),),
+                                              trailing: Icon(Icons.more_horiz, color: Colors.grey,),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: const [
+                                                    Text("Kes 36,840", style: TextStyle(fontSize: 18.0, color: Colors.teal, fontWeight: FontWeight.bold),),
+                                                    SizedBox(height: 5.0,),
+                                                    Text("paid invoices", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: const [
+                                                    Text("Kes 8,420", style: TextStyle(fontSize: 18.0, color: Colors.red, fontWeight: FontWeight.bold),),
+                                                    SizedBox(height: 5.0,),
+                                                    Text("open invoices", style: TextStyle(fontSize: 15.0, color: Colors.grey, fontWeight: FontWeight.bold),),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(15.0),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                RaisedButton.icon(
+                                                  elevation: 0.0,
+                                                  hoverColor: Colors.transparent,
+                                                  color: Colors.deepPurple.shade100,
+                                                  icon: const Icon(Icons.paid_outlined, color: Colors.deepPurple,),
+                                                  label: const Text("Receive Payments", style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold)),
+                                                  onPressed: () {},
+                                                ),
+                                                const Text("View All", style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold))
+                                              ],
+                                            ),
+                                          ),
+
+                                        ],
+                                      ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  Container(
+                                    width: size.width,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(3.0),
+                                        color: Colors.white,
+                                        boxShadow: const [
+                                          BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 1,
+                                              spreadRadius: 1.0,
+                                              offset: Offset(0.0, 0.0)
+                                          )
+                                        ],
+                                        border: Border.all(width: 0.5, color: Colors.grey.shade300)
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                          title: Text("KES 6,280", style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),),
+                                          trailing: IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(Icons.more_horiz, color: Colors.grey,),
+                                          ),
+                                        ),
+                                        const ListTile(
+                                          title: Text("Outstanding Balances", style: TextStyle(fontWeight: FontWeight.bold),),
+                                          subtitle: Text("All properties", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),),
+                                          trailing: Icon(Icons.equalizer, color: Colors.teal, size: 30.0,),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
                             )
                           ],
