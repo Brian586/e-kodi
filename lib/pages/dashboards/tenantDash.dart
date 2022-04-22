@@ -281,13 +281,12 @@ class _TenantDashState extends State<TenantDash> {
                     startValue: 0.0,
                     sizeUnit: GaugeSizeUnit.factor,
                     color: const Color.fromRGBO(197, 91, 226, 1),
-                    gradient: const SweepGradient(colors: <Color>[
+                    gradient: const SweepGradient(
+                        colors: <Color>[
+                      Color.fromRGBO(115, 67, 189, 1),
                       Color.fromRGBO(197, 91, 226, 1),
-                      Color.fromRGBO(115, 67, 189, 1)
-                    ], stops: <double>[
-                      0.5,
-                      1
-                    ]),
+                    ],
+                    ),
                     endWidth: 0.1,
                     startWidth: 0.1)
               ],
@@ -379,6 +378,7 @@ class _TenantDashState extends State<TenantDash> {
         ],
       ),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             flex: 7,
@@ -387,10 +387,12 @@ class _TenantDashState extends State<TenantDash> {
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text("Dashboard", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20.0),),
                         SizedBox(
@@ -612,7 +614,7 @@ class _TenantDashState extends State<TenantDash> {
                                                           mainAxisAlignment: MainAxisAlignment.end,
                                                           children: [
                                                             RaisedButton.icon(
-                                                              color: Colors.blue,
+                                                              color: Colors.deepPurple,
                                                               shape: RoundedRectangleBorder(
                                                                 borderRadius: BorderRadius.circular(5.0),
                                                               ),
@@ -628,13 +630,13 @@ class _TenantDashState extends State<TenantDash> {
                                                                 decoration: BoxDecoration(
                                                                     borderRadius: BorderRadius.circular(5.0),
                                                                     border: Border.all(
-                                                                        color: Colors.red,
+                                                                        color: Colors.deepPurple,
                                                                         width: 1.0
                                                                     )
                                                                 ),
                                                                 child: const Padding(
                                                                   padding: EdgeInsets.symmetric(horizontal: 5.0),
-                                                                  child: Center(child: Text("Request to Leave Property", style: TextStyle(color: Colors.red),)),
+                                                                  child: Center(child: Text("Request to Leave Property", style: TextStyle(color: Colors.deepPurple),)),
                                                                 ),
                                                               ),
                                                             ),
@@ -661,6 +663,7 @@ class _TenantDashState extends State<TenantDash> {
                       ),
                     ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           flex: 1,
@@ -680,6 +683,29 @@ class _TenantDashState extends State<TenantDash> {
                                     )
                                   ],
                                   border: Border.all(width: 0.5, color: Colors.grey.shade300)
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const ListTile(
+                                    title: Text('Recent Transactions', style: TextStyle(fontWeight: FontWeight.bold),),
+                                    trailing: Text('See all', style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),),
+                                  ),
+                                  Divider(color: Colors.grey.shade300,),
+                                  Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.currency_exchange_rounded, color: Colors.grey.shade300,),
+                                          SizedBox(height: 5.0,),
+                                          Text("No transactions")
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
                           ),
@@ -790,11 +816,11 @@ class _TenantDashState extends State<TenantDash> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Service Providers", style: TextStyle(fontWeight: FontWeight.bold),),
+                        const Text("Service Providers", style: TextStyle(fontWeight: FontWeight.bold),),
                         PopupMenuButton<String>(
                           icon: const Icon(Icons.filter_list_rounded, color: Colors.grey,),
                           offset: const Offset(0.0, 0.0),
