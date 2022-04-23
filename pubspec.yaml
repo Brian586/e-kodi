@@ -55,6 +55,7 @@ dependencies:
   syncfusion_flutter_gauges: ^20.1.50
   flutter_launcher_icons: ^0.9.2
   intl: ^0.17.0
+  grouped_list: ^4.2.0
 
 
 flutter_icons:

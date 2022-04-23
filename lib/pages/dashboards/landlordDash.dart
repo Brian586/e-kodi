@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart' as pie_chart;
 import 'package:provider/provider.dart';
+import 'package:rekodi/chat/chatHome.dart';
 import 'package:rekodi/model/property.dart';
 import 'package:rekodi/model/tabItem.dart';
 import 'package:rekodi/providers/datePeriod.dart';
@@ -598,11 +599,23 @@ class _LandlordDashState extends State<LandlordDash> {
       case "Reports":
         return const Center(child: Text("Reports"),);
       case "Messages":
-        return const Center(child: Text("Messages"),);
+        return Padding(
+          padding: const EdgeInsets.only(right: 15.0, top: 10.0),
+          child: Container(
+            height: size.height,
+            width: size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+              border: Border.all(
+                color: Colors.grey.shade300,
+                width: 1.0
+              )
+            ),
+            child: const ChatHome(),
+          ),
+        );
       case "Tasks":
         return const Center(child: Text("Tasks"),);
-      case "More":
-        return const Center(child: Text("More"),);
     }
   }
 

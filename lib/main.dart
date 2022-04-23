@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:rekodi/chat/chatProvider/chatProvider.dart';
 import 'package:rekodi/config.dart';
 import 'package:rekodi/model/account.dart';
 import 'package:rekodi/model/property.dart';
@@ -33,7 +34,8 @@ void main() async {
     providers: [
       ChangeNotifierProvider<EKodi>(create: (_)=> EKodi(),),
       ChangeNotifierProvider<Loader>(create: (_)=> Loader()),
-      ChangeNotifierProvider<DatePeriodProvider>(create: (_)=> DatePeriodProvider())
+      ChangeNotifierProvider<DatePeriodProvider>(create: (_)=> DatePeriodProvider()),
+      ChangeNotifierProvider<ChatProvider>(create: (_)=> ChatProvider())
     ],
     child: const MyApp(),
   ));

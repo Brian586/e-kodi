@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:rekodi/chat/chatDetails.dart';
+import 'package:rekodi/chat/chatHome.dart';
 import 'package:rekodi/model/serviceProvider.dart';
 import 'package:rekodi/widgets/customTextField.dart';
 import 'package:rekodi/widgets/loadingAnimation.dart';
@@ -29,7 +31,6 @@ class _ServiceDashState extends State<ServiceDash> {
   TextEditingController _city = TextEditingController();
   TextEditingController _country = TextEditingController();
   TextEditingController _description = TextEditingController();
-  late ServiceProvider serviceProvider;
 
 
   @override
@@ -52,22 +53,22 @@ class _ServiceDashState extends State<ServiceDash> {
       {
         ServiceProvider provider = await showDetailsDialog(userID);
 
-        print("no. 2 "+provider.title!);
-
         await FirebaseFirestore.instance.collection("serviceProviders").doc(provider.providerID).set(provider.toMap());
+
+        await context.read<EKodi>().switchServiceProvider(provider);
 
         setState(() {
           loading = false;
-          serviceProvider = provider;
         });
 
       }
     else {
       ServiceProvider provider = ServiceProvider.fromDocument(documentSnapshot);
 
+      await context.read<EKodi>().switchServiceProvider(provider);
+
       setState(() {
         loading = false;
-        serviceProvider = provider;
       });
     }
   }
@@ -207,10 +208,10 @@ class _ServiceDashState extends State<ServiceDash> {
                       description: _description.text.trim(),
                       rating: 0,
                       ratings: [],
-                      timestamp: DateTime.now().millisecondsSinceEpoch
+                      timestamp: DateTime.now().millisecondsSinceEpoch,
+                      category: _category.text.trim(),
                     );
 
-                    print("no. 1 "+provider.title!);
 
                     Navigator.of(context).pop(provider);
                   }
@@ -280,6 +281,7 @@ class _ServiceDashState extends State<ServiceDash> {
   Widget build(BuildContext context) {
     Account account = context.watch<EKodi>().account;
     Size size = MediaQuery.of(context).size;
+    ServiceProvider provider = context.watch<EKodi>().serviceProvider;
 
 
     return Scaffold(
@@ -323,38 +325,40 @@ class _ServiceDashState extends State<ServiceDash> {
             icon: const Icon(Icons.question_answer_outlined, color: Colors.white30,),
           ),
           const SizedBox(width: 10.0,),
-          displayUserProfile(account),
+          loading ? Container() : displayUserProfile(account),
           const SizedBox(width: 20.0,),
         ],
       ),
       body: loading ? const LoadingAnimation(): Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
             flex: 35,
-            child: Container(),
+            child: ChatHome(),
           ),
-          VerticalDivider(color: Colors.grey.shade300,),
+          VerticalDivider(color: Colors.grey.shade300, width: 1.0, thickness: 1.0,),
           Expanded(
             flex: 35,
-            child: Container(),
+            child: ChatDetails(),
           ),
           VerticalDivider(color: Colors.grey.shade300,),
           Expanded(
-            flex: 3,
+            flex: 30,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(35.0),
-                  child: serviceProvider.photoUrl!  == ""
+                  child: provider.photoUrl!  == ""
                       ? Image.asset("assets/profile.png", height: 70.0, width: 70.0, fit: BoxFit.cover,)
-                      : Image.network(serviceProvider.photoUrl!, height: 70.0, width: 70.0,fit: BoxFit.cover),
+                      : Image.network(provider.photoUrl!, height: 70.0, width: 70.0,fit: BoxFit.cover),
                 ),
-                Text(serviceProvider.title!),
-                Text(serviceProvider.email!),
-                Text(serviceProvider.phone!),
-                Text(serviceProvider.description!, maxLines: 10, overflow: TextOverflow.ellipsis,),
+                Text(provider.title!),
+                Text(provider.email!),
+                Text(provider.phone!),
+                Text(provider.description!, maxLines: 10, overflow: TextOverflow.ellipsis,),
               ],
             ),
           ),
