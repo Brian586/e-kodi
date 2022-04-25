@@ -4,12 +4,10 @@ import 'package:rekodi/model/serviceProvider.dart';
 
 class ChatProvider with ChangeNotifier {
   Account? _receiverAccount;
-  ServiceProvider? _serviceProvider;
-  bool? _isServiceProvider;
+  bool? _isOpen = false;
 
   Account get receiverAccount => _receiverAccount!;
-  ServiceProvider get serviceProvider => _serviceProvider!;
-  bool get isServiceProvider => _isServiceProvider!;
+  bool get isOpen => _isOpen!;
 
   switchAccount(Account account) {
     _receiverAccount = account;
@@ -17,14 +15,8 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  switchProvider(ServiceProvider provider ) {
-    _serviceProvider = provider;
-
-    notifyListeners();
-  }
-
-  isProvider(bool isProvider) {
-    _isServiceProvider = isProvider;
+  openChatDetails(bool value) {
+    _isOpen = value;
 
     notifyListeners();
   }

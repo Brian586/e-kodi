@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:rekodi/widgets/loadingAnimation.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../config.dart';
@@ -15,7 +16,7 @@ import '../model/unit.dart';
 import '../widgets/customTextField.dart';
 
 class AddTenant extends StatefulWidget {
-  final Object? property;
+  final Property? property;
 
   const AddTenant( this.property, {Key? key,}) : super(key: key);
 
@@ -33,7 +34,6 @@ class _AddTenantState extends State<AddTenant> {
   String paymentFreq = 'Monthly';
   List<Unit> allUnits = [];
   late Unit selectedUnit;
-  late Property property;
   bool loading = false;
   late Account tenantAccount;
 
@@ -47,11 +47,10 @@ class _AddTenantState extends State<AddTenant> {
 
   getUnits() async {
     setState(() {
-      property = widget.property as Property;
       loading = true;
     });
 
-    await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((querySnapshot) {
+    await FirebaseFirestore.instance.collection("properties").doc(widget.property!.propertyID!).collection("units").get().then((querySnapshot) {
       querySnapshot.docs.forEach((element) {
         Unit unit = Unit.fromDocument(element);
 
@@ -101,7 +100,7 @@ class _AddTenantState extends State<AddTenant> {
 
     Unit unit = Unit(
       name: selectedUnit.name,
-      tenantID: tenantAccount.userID,
+      tenantInfo: tenantAccount.toMap(),
       rent: int.parse(rent.text.trim()),
       propertyID: selectedUnit.propertyID,
       dueDate: dueDate,
@@ -115,22 +114,22 @@ class _AddTenantState extends State<AddTenant> {
     );
 
     //save tenant info to unit
-    await FirebaseFirestore.instance.collection("properties").doc(property.propertyID)
+    await FirebaseFirestore.instance.collection("properties").doc(widget.property!.propertyID)
         .collection("units").doc(selectedUnit.unitID.toString()).update(unit.toMap()).then((value) {
           Fluttertoast.showToast(msg: "Added Tenant Successfully!");
     });
 
-    await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).update(
+    await FirebaseFirestore.instance.collection("properties").doc(widget.property!.propertyID).update(
         {
-          "occupied": property.occupied! + 1,
-          "vacant": property.vacant! - 1,
+          "occupied": widget.property!.occupied! + 1,
+          "vacant": widget.property!.vacant! - 1,
         });
 
     //save unit info to tenant
     await FirebaseFirestore.instance.collection("users").doc(tenantAccount.userID)
         .collection("units").doc(unit.unitID.toString()).set(unit.toMap());
 
-    Navigator.pop(context);
+    Navigator.pop(context, "uploaded");
 
     setState(() {
       loading = false;
@@ -280,163 +279,162 @@ class _AddTenantState extends State<AddTenant> {
           const SizedBox(width: 20.0,),
         ],
       ),
-      body:  loading ? Container(
-          height: size.height,
-          width: size.width,
-          color: Colors.white,
-          child: Center(child: Image.asset("assets/loading.gif"),)) : Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Add New Tenant", textAlign: TextAlign.start, style: GoogleFonts.roboto(fontWeight: FontWeight.bold, fontSize: 40.0, )),
-            const SizedBox(height: 10.0,),
-            Container(
-              width: size.width*0.6,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                color: Colors.white,
-                boxShadow: const [
-                  BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 2.0,
-                      spreadRadius: 2.0,
-                      offset: Offset(0.0, 0.0)
-                  )
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text("Select Unit", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
-                    ListView.builder(
-                      itemCount: allUnits.length,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        Unit unit = allUnits[index];
-                        bool isSelected = unit == selectedUnit;
-                        bool isOccupied = unit.isOccupied!;
-
-                        return Card(
-                          elevation: 5.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          child: ListTile(
-                            onTap: () {
-                              if(!isOccupied) {
-                                setState(() {
-                                  selectedUnit = unit;
-                                });
-                              }
-                            },
-                            leading: isOccupied ? const Icon(Icons.check_box, color: Colors.grey,) : isSelected
-                                ? const Icon(Icons.check_box, color: Colors.teal,)
-                                : const Icon(Icons.check_box_outline_blank_rounded, color: Colors.grey,),
-                            title: isOccupied ? Text(unit.name!, style: const TextStyle(decoration: TextDecoration.lineThrough)) : Text(unit.name!),
-                            subtitle: Text(unit.isOccupied! ? "Occupied" : "Vacant"),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20.0,),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Text("Start Date", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(DateFormat('dd MMM yyyy').format(DateTime.fromMillisecondsSinceEpoch(startDate)), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),),
-                          const SizedBox(width: 5.0,),
-                          IconButton(
-                            onPressed: () => displayCalendar(context),
-                            icon: const Icon(Icons.date_range_rounded, color: Colors.grey,),
-                          )
-                        ],
-                      ),
-                    ),
-                    MyTextField(
-                      controller: tenantEmail,
-                      hintText: "Email Address",
-                      width:  size.width,
-                      title: "Tenant Email Address",
-                    ),
-                    MyTextField(
-                      controller: rent,
-                      hintText: "Rent Amount",
-                      width:  size.width,
-                      title: "Rent Amount (KES)",
-                    ),
-                    const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Payment Frequency?", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),),
-                        )
-                    ),
-                    const SizedBox(height: 5.0,),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-                      child: DropdownSearch<String>(
-                          mode: Mode.MENU,
-                          showSelectedItems: true,
-                          items: const [
-                            "One-Time(Airbnb)",
-                            "Weekly",
-                            "Monthly",
-                            "Bi-Annually(6 Months)",
-                            "Yearly"
-                          ],
-                          hint: "Is this property a multi-unit?",
-                          onChanged: (v) {
-                            setState(() {
-                              paymentFreq = v!;
-                            });
-                          },
-                          selectedItem: paymentFreq),
-                    ),
-                    MyTextField(
-                      controller: deposit,
-                      hintText: "Deposit Amount",
-                      width:  size.width,
-                      title: "Deposit Amount (KES)",
-                    ),
-                    MyTextField(
-                      controller: notes,
-                      hintText: "Notes",
-                      width:  size.width,
-                      title: "Type something here...",
-                    ),
-                    MyTextField(
-                      controller: reminder,
-                      hintText: "0 days",
-                      width:  size.width,
-                      title: "Tenant Rent Reminder Days Before",
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: RaisedButton.icon(
-                          onPressed: addTenantToUnit,
-                          icon: Icon(Icons.done_rounded, color:Colors.white),
-                          label: Text("Save", style: TextStyle(color:Colors.white),),
-                          color:Colors.blueAccent
-                      ),
+      body:  loading ? LoadingAnimation() : Center(
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Add New Tenant", textAlign: TextAlign.start, style: GoogleFonts.roboto(fontWeight: FontWeight.bold, fontSize: 40.0, )),
+              const SizedBox(height: 10.0,),
+              Container(
+                width: size.width*0.6,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  color: Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 2.0,
+                        spreadRadius: 2.0,
+                        offset: Offset(0.0, 0.0)
                     )
                   ],
                 ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text("Select Unit", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                      ListView.builder(
+                        itemCount: allUnits.length,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          Unit unit = allUnits[index];
+                          bool isSelected = unit == selectedUnit;
+                          bool isOccupied = unit.isOccupied!;
+
+                          return Card(
+                            elevation: 5.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: ListTile(
+                              onTap: () {
+                                if(!isOccupied) {
+                                  setState(() {
+                                    selectedUnit = unit;
+                                  });
+                                }
+                              },
+                              leading: isOccupied ? const Icon(Icons.check_box, color: Colors.grey,) : isSelected
+                                  ? const Icon(Icons.check_box, color: Colors.teal,)
+                                  : const Icon(Icons.check_box_outline_blank_rounded, color: Colors.grey,),
+                              title: isOccupied ? Text(unit.name!, style: const TextStyle(decoration: TextDecoration.lineThrough)) : Text(unit.name!),
+                              subtitle: Text(unit.isOccupied! ? "Occupied" : "Vacant"),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20.0,),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Text("Start Date", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(DateFormat('dd MMM yyyy').format(DateTime.fromMillisecondsSinceEpoch(startDate)), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),),
+                            const SizedBox(width: 5.0,),
+                            IconButton(
+                              onPressed: () => displayCalendar(context),
+                              icon: const Icon(Icons.date_range_rounded, color: Colors.grey,),
+                            )
+                          ],
+                        ),
+                      ),
+                      MyTextField(
+                        controller: tenantEmail,
+                        hintText: "Email Address",
+                        width:  size.width,
+                        title: "Tenant Email Address",
+                      ),
+                      MyTextField(
+                        controller: rent,
+                        hintText: "Rent Amount",
+                        width:  size.width,
+                        title: "Rent Amount (KES)",
+                      ),
+                      const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Payment Frequency?", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),),
+                          )
+                      ),
+                      const SizedBox(height: 5.0,),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+                        child: DropdownSearch<String>(
+                            mode: Mode.MENU,
+                            showSelectedItems: true,
+                            items: const [
+                              "One-Time(Airbnb)",
+                              "Weekly",
+                              "Monthly",
+                              "Bi-Annually(6 Months)",
+                              "Yearly"
+                            ],
+                            hint: "Is this property a multi-unit?",
+                            onChanged: (v) {
+                              setState(() {
+                                paymentFreq = v!;
+                              });
+                            },
+                            selectedItem: paymentFreq),
+                      ),
+                      MyTextField(
+                        controller: deposit,
+                        hintText: "Deposit Amount",
+                        width:  size.width,
+                        title: "Deposit Amount (KES)",
+                      ),
+                      MyTextField(
+                        controller: notes,
+                        hintText: "Notes",
+                        width:  size.width,
+                        title: "Type something here...",
+                      ),
+                      MyTextField(
+                        controller: reminder,
+                        hintText: "0 days",
+                        width:  size.width,
+                        title: "Tenant Rent Reminder Days Before",
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: RaisedButton.icon(
+                            onPressed: addTenantToUnit,
+                            icon: Icon(Icons.done_rounded, color:Colors.white),
+                            label: Text("Save", style: TextStyle(color:Colors.white),),
+                            color:Colors.blueAccent
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

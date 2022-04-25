@@ -84,7 +84,7 @@ class _AddPropertyState extends State<AddProperty> {
                 unitID: property.timestamp,
                 name: name.text.trim(),
                 description: notes.text.trim(),
-                tenantID: "",
+                tenantInfo: {},
                 isOccupied: false,
                 rent: 0,
                 dueDate: 0,
@@ -100,7 +100,7 @@ class _AddPropertyState extends State<AddProperty> {
             }
       });
 
-      Navigator.pop(context);
+      Navigator.pop(context, "uploaded");
 
       setState(() {
         loading = false;
@@ -128,7 +128,7 @@ class _AddPropertyState extends State<AddProperty> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_rounded, color: Colors.black,),
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context, "canceled");
               },
             ),
             actions: [
@@ -316,7 +316,7 @@ class _AddPropertyState extends State<AddProperty> {
                                                     name: unitName.text,
                                                     description: unitDesc.text,
                                                   unitID: DateTime.now().millisecondsSinceEpoch,
-                                                  tenantID: "",
+                                                  tenantInfo: {},
                                                   isOccupied: false,
                                                   rent: 0,
                                                   dueDate: 0,

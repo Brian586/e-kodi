@@ -5,11 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart' as pie_chart;
 import 'package:provider/provider.dart';
+import 'package:rekodi/chat/chatBuilder.dart';
 import 'package:rekodi/chat/chatHome.dart';
+import 'package:rekodi/chat/chatProvider/chatProvider.dart';
 import 'package:rekodi/main.dart';
 import 'package:rekodi/model/property.dart';
 import 'package:rekodi/model/tabItem.dart';
 import 'package:rekodi/pages/addProperty.dart';
+import 'package:rekodi/pages/propertyDetails.dart';
 import 'package:rekodi/providers/datePeriod.dart';
 import 'package:rekodi/widgets/customTextField.dart';
 import 'package:rekodi/widgets/loadingAnimation.dart';
@@ -98,14 +101,6 @@ class _LandlordDashState extends State<LandlordDash> {
         vacantUnits = vacantUnits + property.vacant!.toInt();
 
         occupiedUnits = occupiedUnits + property.occupied!.toInt();
-
-        // await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
-        //   value.docs.forEach((unitDoc) {
-        //     Unit unit = Unit.fromDocument(unitDoc);
-        //
-        //     allUnits.add(unit);
-        //   });
-        // });
       });
     });
 
@@ -117,40 +112,39 @@ class _LandlordDashState extends State<LandlordDash> {
   addNewProperty() async {
     //wait for user to add property
     Route route = MaterialPageRoute(builder: (context) => const AddProperty());
-    await Navigator.push(context, route);
+    String res = await Navigator.push(context, route);
 
-    vacantUnits = 0;
-    occupiedUnits = 0;
-
-    String userID = Provider.of<EKodi>(context, listen: false).account.userID!;
-
-    // load property from database
-
-    await FirebaseFirestore.instance
-        .collection('properties')
-        .where("publisherID", isEqualTo: userID)
-        .orderBy("timestamp", descending: true)
-        .get()
-        .then((documents) {
-      documents.docs.forEach((document) async {
-        Property property = Property.fromDocument(document);
-
-        properties.add(property);
-
-        vacantUnits = vacantUnits + property.vacant!.toInt();
-
-        occupiedUnits = occupiedUnits + property.occupied!.toInt();
-
-        // await FirebaseFirestore.instance.collection("properties").doc(property.propertyID).collection("units").get().then((value) {
-        //   value.docs.forEach((unitDoc) {
-        //     Unit unit = Unit.fromDocument(unitDoc);
-        //
-        //     allUnits.add(unit);
-        //   });
-        // });
+    if(res == "uploaded") {
+      setState(() {
+        vacantUnits = 0;
+        occupiedUnits = 0;
+        properties.clear();
       });
-    });
 
+      String userID = Provider.of<EKodi>(context, listen: false).account.userID!;
+
+      // load property from database
+
+      await FirebaseFirestore.instance
+          .collection('properties')
+          .where("publisherID", isEqualTo: userID)
+          .orderBy("timestamp", descending: true)
+          .get()
+          .then((documents) {
+        documents.docs.forEach((document) async {
+          Property property = Property.fromDocument(document);
+
+          properties.add(property);
+
+          setState(() {
+            vacantUnits = vacantUnits + property.vacant!.toInt();
+
+            occupiedUnits = occupiedUnits + property.occupied!.toInt();
+          });
+        });
+      });
+
+    }
     setState(() {});
   }
 
@@ -654,7 +648,7 @@ class _LandlordDashState extends State<LandlordDash> {
                                       Icons.currency_exchange_rounded,
                                       color: Colors.grey.shade300,
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 5.0,
                                     ),
                                     Text("No transactions")
@@ -762,16 +756,9 @@ class _LandlordDashState extends State<LandlordDash> {
           child: Text("Reports"),
         );
       case "Messages":
-        return Padding(
-          padding: const EdgeInsets.only(right: 15.0, top: 10.0),
-          child: Container(
-            height: size.height,
-            width: size.width,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(color: Colors.grey.shade300, width: 1.0)),
-            child: const ChatHome(),
-          ),
+        return const Padding(
+          padding: EdgeInsets.only(right: 15.0, top: 10.0),
+          child: ChatBuilder(),
         );
       case "Tasks":
         return const Center(
@@ -873,8 +860,8 @@ class _LandlordDashState extends State<LandlordDash> {
                               horizontal: 10.0, vertical: 5.0),
                           child: InkWell(
                             onTap: () {
-                              Navigator.pushNamed(context, "/property_details",
-                                  arguments: property);
+                              Route route = MaterialPageRoute(builder: (context)=> PropertyDetails(property));
+                              Navigator.push(context, route);
                             },
                             child: Card(
                               shape: RoundedRectangleBorder(
@@ -1188,8 +1175,10 @@ class _LandlordDashState extends State<LandlordDash> {
                                       horizontal: 5.0),
                                   child: InkWell(
                                     onTap: () {
+
                                       setState(() {
                                         selected = item.name!;
+                                        context.read<ChatProvider>().openChatDetails(false);
                                       });
                                     },
                                     child: Container(
@@ -1308,12 +1297,8 @@ class _LandlordDashState extends State<LandlordDash> {
                                 children: [
                                   Expanded(
                                     flex: 7,
-                                    child: SizedBox(
-                                      width: size.width,
-                                      height: size.height,
-                                      child: displayTab(size, sizeInfo,
-                                          start: startDate, end: endDate),
-                                    ),
+                                    child: displayTab(size, sizeInfo,
+                                        start: startDate, end: endDate),
                                   ),
                                   Expanded(
                                     flex: 3,
@@ -1875,8 +1860,6 @@ class _LandlordDashMobileState extends State<LandlordDashMobile> {
     await Navigator.push(context, route);
 
     // load property from database
-
-    print("===============1=================");
 
     await FirebaseFirestore.instance
         .collection('users')

@@ -628,7 +628,7 @@ class _TenantDashState extends State<TenantDash> {
                               ),
                             ),
                             subtitle: const Text(
-                                "Welcome to e-KODI! Here's your activity today."),
+                                "Welcome to e-KODI! Here's your activity."),
                             trailing: RaisedButton.icon(
                               elevation: 0.0,
                               hoverColor: Colors.transparent,

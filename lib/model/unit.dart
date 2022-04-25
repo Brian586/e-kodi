@@ -4,7 +4,7 @@ class Unit {
   final String? name;
   final String? description;
   final int? unitID;
-  final String? tenantID;
+  final Map<String, dynamic>? tenantInfo;
   final bool? isOccupied;
   final int? rent;
   final int? deposit;
@@ -16,7 +16,7 @@ class Unit {
 
   Unit({
     this.name,
-    this.tenantID,
+    this.tenantInfo,
     this.rent,
     this.propertyID,
     this.dueDate,
@@ -34,7 +34,7 @@ class Unit {
       "name": name,
       "description": description,
       "unitID": unitID,
-      "tenantID": tenantID,
+      "tenantInfo": tenantInfo,
       "isOccupied": isOccupied,
       "rent": rent,
       "dueDate": dueDate,
@@ -51,7 +51,7 @@ class Unit {
       name: doc.get("name") ?? "",
       description: doc.get("description") ?? "",
       unitID: doc.get("unitID") ?? "",
-      tenantID: doc.get("tenantID") ?? "",
+      tenantInfo: doc.get("tenantInfo") ?? "",
       isOccupied: doc.get("isOccupied") ?? "",
       rent: doc.get("rent") ?? "",
       dueDate: doc.get("dueDate") ?? "",

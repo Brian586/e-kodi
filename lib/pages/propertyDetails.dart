@@ -1,13 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rekodi/model/property.dart';
+import 'package:rekodi/pages/addTenant.dart';
+import 'package:rekodi/widgets/loadingAnimation.dart';
 
 import '../config.dart';
 import '../model/account.dart';
+import '../model/unit.dart';
 
 class PropertyDetails extends StatefulWidget {
-  final Object? property;
+  final Property? property;
 
   const PropertyDetails(this.property,{Key? key, }) : super(key: key);
 
@@ -16,15 +21,28 @@ class PropertyDetails extends StatefulWidget {
 }
 
 class _PropertyDetailsState extends State<PropertyDetails> {
-  late Property property;
-
+  List<Unit> units = [];
+  bool loading = false;
 
   @override
   void initState() {
+    getUnits();
     super.initState();
+  }
+
+  void getUnits() async {
+    setState(() {
+      loading = true;
+    });
+
+    await FirebaseFirestore.instance.collection("properties").doc(widget.property!.propertyID).collection("units").get().then((value) {
+      value.docs.forEach((element) {
+        units.add(Unit.fromDocument(element));
+      });
+    });
 
     setState(() {
-      property = widget.property as Property;
+      loading = false;
     });
   }
 
@@ -32,9 +50,28 @@ class _PropertyDetailsState extends State<PropertyDetails> {
 
     //TODO: Remember to check if all units are occupied before adding tenant
 
-    await Navigator.pushNamed(context, "/add_tenant", arguments: property);
+    Route route = MaterialPageRoute(builder: (context)=> AddTenant(widget.property));
+
+    String res = await Navigator.push(context, route);
 
     //get tenant details
+
+    if(res == "uploaded"){
+      setState(() {
+        units.clear();
+        loading = true;
+      });
+
+      await FirebaseFirestore.instance.collection("properties").doc(widget.property!.propertyID).collection("units").get().then((value) {
+        value.docs.forEach((element) {
+          units.add(Unit.fromDocument(element));
+        });
+      });
+
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   displayUserProfile(Account account) {
@@ -57,6 +94,46 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           ],
         )
       ],
+    );
+  }
+
+  Widget showUnits(Size size) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      childAspectRatio: size.width*0.5/200.0,
+      children: List.generate(units.length, (index) {
+        Unit unit = units[index];
+        String date = DateFormat('dd MMM yyyy').format(DateTime.fromMillisecondsSinceEpoch(unit.startDate!));
+
+        return Card(
+          elevation: 3.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0)
+          ),
+          child: SizedBox(
+            height: 100.0,
+            width:  size.width*0.5,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.house_rounded, color: Colors.grey, ),
+                  title: Text(unit.name!, style: TextStyle(fontWeight: FontWeight.bold),),
+                  subtitle: Text(unit.description!, maxLines: 3, overflow: TextOverflow.ellipsis,),
+                  trailing: unit.isOccupied! ? const Text("Occupied", style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold) ) : const Text("Vacant", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
+                ),
+                unit.isOccupied! ? ListTile(
+                  title: Text("Occupied By: ${unit.tenantInfo!["name"]}", maxLines: 2, overflow: TextOverflow.ellipsis,),
+                  subtitle: Text("From $date to Date"),
+                  trailing: Text("Rent: KES ${unit.rent.toString()}", style: const TextStyle(fontWeight: FontWeight.bold),),
+                ) : Container()
+              ],
+            ),
+          ),
+        );
+      }),
     );
   }
 
@@ -100,10 +177,16 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           const SizedBox(width: 20.0,),
         ],
       ),
-      body: SingleChildScrollView(
+      body: loading ? LoadingAnimation(): SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            TextButton.icon(
+              onPressed: () {Navigator.pop(context);},
+              icon: Icon(Icons.arrow_back_rounded, color: Colors.grey,),
+              label: Text("Back", style: TextStyle(color: Colors.grey),),
+            ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: size.width*0.1),
               child: Row(
@@ -135,8 +218,8 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                             children: [
                               Text("Property Details", style: Theme.of(context).textTheme.titleMedium,),
                               const Divider(color: Colors.grey,),
-                              Text(property.name!, style: Theme.of(context).textTheme.bodyMedium,),
-                              Text("${property.address!}, ${property.city!} ${property.country!}", style: Theme.of(context).textTheme.bodyMedium,),
+                              Text(widget.property!.name!, style: Theme.of(context).textTheme.bodyMedium,),
+                              Text("${widget.property!.address!}, ${widget.property!.city!} ${widget.property!.country!}", style: Theme.of(context).textTheme.bodyMedium,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -215,6 +298,14 @@ class _PropertyDetailsState extends State<PropertyDetails> {
               ),
             ),
             Padding(
+              padding: EdgeInsets.symmetric(horizontal:size.width*0.1, vertical: 10.0),
+              child: Text("Property Units", style: Theme.of(context).textTheme.headlineSmall,),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal:size.width*0.1),
+              child: showUnits(size),
+            ),
+            widget.property!.vacant == 0 ? Container() : Padding(
               padding: EdgeInsets.symmetric(horizontal: size.width*0.1, vertical: 10.0),
               child: Container(
                 width: size.width,
@@ -400,4 +491,6 @@ class _PropertyDetailsState extends State<PropertyDetails> {
       ),
     );
   }
+
+
 }
